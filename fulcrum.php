@@ -21,6 +21,7 @@ if (!class_exists('D_FULCRUM')) :
 
     // Load in global vars //
     $d_plugin_dirs = [];
+    $d_modules = [];
 
     class D_FULCRUM
     {
@@ -32,17 +33,20 @@ if (!class_exists('D_FULCRUM')) :
         public $modules = [];
 
         public $dirs = [
-            'templates' => 'templates',
-            'templates-modules' => 'templates/modules',
             'partials' => 'templates/partials',
-            'modules' => 'modules',
+            'modules' => 'inc/modules',
             'inc' => 'inc',
             'traits' => 'inc/traits',
             'vendors' => 'inc/vendors',
             'api' => 'inc/api',
             'assets' => 'assets',
             'scripts' => 'assets/js',
-            'styles' => 'assets/css'
+            'styles' => 'assets/css',
+            'templates' => 'templates',
+            'modules' => 'inc/modules',
+            'templates-modules' => 'templates/modules',
+            'api' => 'inc/api',
+            'vendors' => 'inc/vendors'
         ];
 
         // [ 'filename without php' => 'name of dir from above config' ] //
@@ -75,6 +79,7 @@ if (!class_exists('D_FULCRUM')) :
 
             require_once $this->dirs['plugin'] . '/' . $this->dirs['inc'] . '/util.php';
             require_once $this->dirs['plugin'] . '/' . $this->dirs['traits'] . '/d-primary.php';
+            require_once $this->dirs['plugin'] . '/' . $this->dirs['traits'] . '/d-templates.php';
 
             // Lets now load in our other flies with the util loader //
             if ($this->_loading && count($this->_loading) > 0) {
@@ -85,9 +90,6 @@ if (!class_exists('D_FULCRUM')) :
                     $this->instance['loaded'] = $d_loaded;
                 }
             }
-
-
-            // wpp($this);
         }
 
         /**
@@ -104,14 +106,6 @@ if (!class_exists('D_FULCRUM')) :
         }
 
         /**
-         * _reset - []
-         *
-         */
-        function _reset()
-        {
-        }
-
-        /**
          * init - []
          *
          */
@@ -121,14 +115,9 @@ if (!class_exists('D_FULCRUM')) :
 
             // Lets manually load in our starting files //
             $this->_load();
-        }
 
-        /**
-         * loader - []
-         *
-         */
-        function loader()
-        {
+            // Do anything extra after we have loaded in the core //
+
         }
     }
 

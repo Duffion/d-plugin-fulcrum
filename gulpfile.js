@@ -41,7 +41,7 @@ gulp.task('sass', () => {
 });
 
 gulp.task('js', () => {
-    return gulp.src([src_assets_folder + 'js/**/*.js'], { since: gulp.lastRun('js') })
+    return gulp.src(['assets/src/js/**/*.js'], { since: gulp.lastRun('js') })
         .pipe(plumber())
         .pipe(webpack({
             mode: 'production'
@@ -50,7 +50,7 @@ gulp.task('js', () => {
         .pipe(babel({
             presets: ['@babel/env']
         }))
-        .pipe(concat('all.js'))
+        .pipe(concat('main.js'))
         .pipe(uglify())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('assets/js'))
