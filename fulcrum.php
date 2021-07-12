@@ -45,8 +45,7 @@ if (!class_exists('D_FULCRUM')) :
             'templates' => 'templates',
             'modules' => 'inc/modules',
             'templates-modules' => 'templates/modules',
-            'api' => 'inc/api',
-            'vendors' => 'inc/vendors'
+            'api' => 'inc/api'
         ];
 
         // [ 'filename without php' => 'name of dir from above config' ] //
@@ -80,6 +79,7 @@ if (!class_exists('D_FULCRUM')) :
             require_once $this->dirs['plugin'] . '/' . $this->dirs['inc'] . '/util.php';
             require_once $this->dirs['plugin'] . '/' . $this->dirs['traits'] . '/d-primary.php';
             require_once $this->dirs['plugin'] . '/' . $this->dirs['traits'] . '/d-templates.php';
+            require_once $this->dirs['plugin'] . '/' . $this->dirs['inc'] . '/vendors.php';
 
             // Lets now load in our other flies with the util loader //
             if ($this->_loading && count($this->_loading) > 0) {
