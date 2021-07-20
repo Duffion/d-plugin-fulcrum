@@ -13,6 +13,9 @@ class d_vendor
     var $vendors = [
             'plugin-update-checker' => [
                 'dir' => 'plugin-update-checker/',
+            ],
+            'meta-box' => [
+                'dir' => 'meta-box/'
             ]
         ],
         $dir = '/vendors/';

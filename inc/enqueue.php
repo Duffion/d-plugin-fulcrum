@@ -38,7 +38,12 @@ class d_enqueue
                     'deps' => ['jquery', 'jquery-ui-core']
                 ],
                 'version' => '0.0.1',
-            ]
+            ],
+            // 'bootstrap-5' => [
+            //     'file_name' => 'vendors/bootstrap/bootstrap.min.js',
+            //     'params' => [],
+            //     'version' => '5.0.2'
+            // ]
         ];
 
         $this->styles = [

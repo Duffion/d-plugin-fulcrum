@@ -22,6 +22,8 @@ class fulcrum_adp
 
     var $menu_item = [];
 
+    private $meta_boxes = [];
+
     function __construct()
     {
     }
@@ -58,9 +60,20 @@ class fulcrum_adp
 
     function view_adp()
     {
-        echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
-        echo '<h2>Fulcrum Module - Auto Draft Publisher</h2>';
-        echo '</div>';
+        // echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
+        // echo '<h2>Fulcrum Module - Auto Draft Publisher</h2>';
+        // echo '</div>';
+        // We need to include the partial template using our template trait and output it here //
+        // Get all product categories //
+        $args = array(
+            'taxonomy'   => "product_cat",
+            'hide_empty' => false,
+        );
+        $product_categories = get_terms($args);
+
+        $this->partial('modules', 'auto-draft-publisher', ['cats' => $product_categories]);
+
+        wpp($product_categories) . die;
     }
 }
 

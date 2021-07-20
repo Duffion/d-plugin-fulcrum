@@ -1,0 +1,27 @@
+
+.form-switch {
+    .form-check-input {
+        width: 15px;
+        border: none;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:checked {
+
+            &:before {
+                height: auto;
+                width: 100%;
+                margin: 0;
+            }
+        }
+    }
+}
+
+.d-fulcrum__form {
+
+    .list-group {
+        flex-direction: row;
+    }
+}
