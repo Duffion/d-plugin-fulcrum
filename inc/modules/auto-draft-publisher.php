@@ -26,12 +26,13 @@ class fulcrum_adp
 
     function __construct()
     {
+
     }
 
     function init()
     {
         $this->_define();
-        $this->_actions($this->actions);
+        $this->_actions($this->actions, $this);
         $this->_filters($this->filters);
     }
 
@@ -47,7 +48,11 @@ class fulcrum_adp
             'position' => 2
         ];
 
-        $this->actions = [];
+        $this->actions = [
+            'admin_post_adp_category_response' => [
+                'function' =>  'handle_category_form'
+            ]
+        ];
 
         $this->filters = [
             'add_subpage' => [
@@ -58,22 +63,58 @@ class fulcrum_adp
         ];
     }
 
+    function get_product_cats()
+    {
+        // Get all product categories //
+        $args = array(
+            'taxonomy'   => "product_cat",
+            'hide_empty' => false,
+        );
+        return get_terms( $args );
+    }
+
     function view_adp()
     {
         // echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
         // echo '<h2>Fulcrum Module - Auto Draft Publisher</h2>';
         // echo '</div>';
         // We need to include the partial template using our template trait and output it here //
-        // Get all product categories //
-        $args = array(
-            'taxonomy'   => "product_cat",
-            'hide_empty' => false,
-        );
-        $product_categories = get_terms($args);
+        $this->partial( 'modules', 'auto-draft-publisher', [ 'cats' => $this->get_product_cats() ] );
+    }
 
-        $this->partial('modules', 'auto-draft-publisher', ['cats' => $product_categories]);
+    function adp_cron()
+    {
+        // Pull wp_option for selected global categories
+        $cats = get_option( 'fulcrum_adp_categories' );
 
-        wpp($product_categories) . die;
+        // Create tax_query with all the selected IDs from wp_option
+
+        // Publish each draft found in selected categories
+
+        // Update Paging / Tracking
+    }
+
+    public function handle_category_form()
+    {
+        if ( isset( $_POST['adp_category_nonce'] ) && wp_verify_nonce( $_POST['adp_category_nonce'], 'adp_category_nonce' ) )
+        {
+            $updated_cats = [];
+            
+            $product_cats = $this->get_product_cats();
+            foreach ( $product_cats as $cat )
+            {
+                $id = 'd--toggle-' . $cat->term_id;
+                if ( isset( $_POST[$id] ) && $_POST[$id] == 'on' )
+                {
+                    $updated_cats[] = $cat->term_id;
+                }
+            }
+
+            // Update the categories option in the database
+            update_option( 'fulcrum_adp_categories', $updated_cats );
+
+            wp_redirect( admin_url( 'admin.php?page=module-adp&response=success' ) );
+        }
     }
 }
 
