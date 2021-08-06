@@ -55,9 +55,8 @@ class fulcrum_ic
 
     function view_ic()
     {
-        echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
-        echo '<h2>Fulcrum Module - Image Cleaning Tool</h2>';
-        echo '</div>';
+
+        $this->partial('modules', 'image-cleaner', []);
     }
 }
 
