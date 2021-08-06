@@ -26,7 +26,10 @@ class fulcrum_adp
 
     function __construct()
     {
-
+        // Add categories wp_option if it doesn't exist
+        if ( !get_option( 'fulcrum_adp_categories' ) ) {
+            add_option( 'fulcrum_adp_categories', [] );
+        }
     }
 
     function init()
@@ -88,10 +91,39 @@ class fulcrum_adp
         $cats = get_option( 'fulcrum_adp_categories' );
 
         // Create tax_query with all the selected IDs from wp_option
+        $args = array(
+            'post_type' => 'product',
+            'post_status' => 'draft',
+            'posts_per_page' => -1,
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $cats
+                )
+            )
+        );
+        $query = new \WP_Query( $args );
 
+        $count = 0;
         // Publish each draft found in selected categories
+        if ( $query->have_posts() ) {
+            while ( $query->have_posts() ) {
+                $query->the_post();
+                $data = array(
+                    'ID' => get_the_ID(),
+                    'post_status' => 'publish'
+                );
+                wp_update_post( $data );
 
-        // Update Paging / Tracking
+                // Clear/refresh product transients
+                wc_delete_product_transients( $data->ID );
+
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     public function handle_category_form()
@@ -113,7 +145,11 @@ class fulcrum_adp
             // Update the categories option in the database
             update_option( 'fulcrum_adp_categories', $updated_cats );
 
-            wp_redirect( admin_url( 'admin.php?page=module-adp&response=success' ) );
+            // Call the adp cron function to auto-publish all drafts in the selected categories
+            $count = $this->adp_cron();
+
+            // Redirect back to the module page with a success message
+            wp_redirect( admin_url( 'admin.php?page=module-adp&response=success&count=' . $count ) );
         }
     }
 }

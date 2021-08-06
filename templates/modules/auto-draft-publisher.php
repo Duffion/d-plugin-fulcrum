@@ -10,9 +10,9 @@ $cats = $args['cats'];
             <div class="col-12-sm gy-5">
                 <h1 class="display-2">Auto Publish Products</h1>
                 <?php
-                if ( isset( $_REQUEST['response'] ) && $_REQUEST['response'] == 'success' ) {
+                if ( isset( $_REQUEST['response'] ) && $_REQUEST['response'] == 'success' && isset( $_REQUEST['count'] ) ) {
                 ?>
-                <p class="alert alert-warning">Successfully updated the products to be auto published.</p>
+                <p class="alert alert-warning">Successfully updated the categories to be auto-published and published <?= $_REQUEST['count']; ?> products in the selected categories.</p>
                 <?php
                 }
                 ?>
