@@ -11,6 +11,7 @@
 
 use  D\FULCRUM\TRAITS\PRIME as D_PRIME;
 use  D\FULCRUM\TRAITS\TEMPLATES as D_TEMPLATES;
+use D\FULCRUM\CRONS\d_crons as CRON;
 
 class fulcrum_pcs
 {
@@ -21,6 +22,7 @@ class fulcrum_pcs
 
     function __construct()
     {
+        $this->cron = new CRON;
     }
 
     function init()
@@ -35,10 +37,20 @@ class fulcrum_pcs
         add_action('wp_ajax_nopriv_pcs_run_jobs', [$this, 'ajax__run_jobs']);
         add_action('wp_ajax_pcs_run_jobs', [$this, 'ajax__run_jobs']);
 
-        add_action('run_jobs__hook', 'run_jobs');
 
         $this->_actions($this->actions);
         $this->_filters($this->filters);
+
+        // we need to now register our cronjobs
+        $this->register_cron();
+    }
+
+    function register_cron()
+    {
+        add_action('pcs__run_jobs_hook', [$this, 'run_jobs']);
+        // wpp($this->cron) . die;
+        // $this->cron->print_tasks();
+        $this->cron->schedule('pcs__run_jobs_hook', 'three_minutes');
     }
 
     function _define()
@@ -179,7 +191,7 @@ class fulcrum_pcs
         $time = time();
 
         // wpp($jobs) . die;
-        if ($jobs && count($jobs) > 0 && is_admin()) {
+        if ($jobs && count($jobs) > 0) {
             usort($jobs, [$this, 'compare_by_last_run']);
             // get th etop job of this sorted joblist
             $job = (isset($jobs[0]) && count($jobs) > 0) ? $jobs[0] : false;

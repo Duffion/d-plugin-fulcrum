@@ -1,6 +1,6 @@
 <?php
 
-namespace D\FULCRUM\CORE\CRONS;
+namespace D\FULCRUM\CRONS;
 
 /*
 D-Cron - Not a disease but a core for helping run / monitor and log wp-cronjobs
@@ -19,6 +19,11 @@ class d_crons
             'name' => 'five_minutes',
             'interval' => 300,
             'display' => 'Every Five Minutes'
+        ],
+        [
+            'name' => 'three_minutes',
+            'interval' => 180,
+            'display' => 'Every Three Minutes'
         ]
     ];
 
@@ -42,6 +47,12 @@ class d_crons
                 'args' => 1
             ]
         ];
+    }
+
+    function print_tasks()
+    {
+        wpp(_get_cron_array());
+        die;
     }
 
     function custom_frequency($schedules)
@@ -70,9 +81,10 @@ class d_crons
 
         if ($check) {
             // it is scheduled lets see if we have to update the call //
+
         } else {
             // schedule the unscheduled hook //
-            wp_schedule_event(time(), $frequency, $action);
+            wp_schedule_event(current_time('timestamp'), $frequency, $action);
         }
     }
 
