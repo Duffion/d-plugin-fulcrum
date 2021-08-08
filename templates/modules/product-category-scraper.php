@@ -26,10 +26,11 @@ $jobs = $args['jobs'];
                             <div class="card pcr-jobs-job">
                                 <div class="card-body">
                                     <h5 class="card-title"><strong><?= $job['search']; ?></strong> Categories - <span><?= implode(' ,', $job['categories']); ?></span></h5>
-                                    <p class="card-text">Last Time Job Ran - <strong><?= ($job['last_ran'] ? date('m-d-Y h:i a', $job['last_ran']) : false) ?></p>
+                                    <p class="card-text">Last Time Job Ran - <strong><?= ($job['last_run'] ? date('m-d-Y h:i a', $job['last_run']) : false) ?></p>
                                 </div>
                                 <div class="card-options">
                                     <div class="btn-group">
+                                        <button class="btn btn-secondary" type="button" data-pcr-action="edit-job" data-modal-trigger="#pcr-add-modal" data-pcr-job='<?= json_encode($job); ?>'>- Edit Job</button>
                                         <button class="btn btn-warning" type="button" data-pcr-action="remove-job" data-pcr-job="<?= $id; ?>">- Delete Job</button>
                                     </div>
                                 </div>
@@ -85,7 +86,7 @@ $jobs = $args['jobs'];
 
                                     <div class="col-12 justify-content-center">
                                         <p class="notice" style="margin-left: 0; margin-right: 0;">Use CRTL + Click to add mutiple categories</p>
-                                        <select class="form-select align-center" size="15" multiple aria-label="multiple select categories" name="target-categories[]">
+                                        <select class="form-select align-center categories" size="15" multiple aria-label="multiple select" name="target-categories[]">
                                             <?php
                                             if ($cats && is_array($cats) && !empty($cats)) {
                                                 foreach ($cats as $cat) {

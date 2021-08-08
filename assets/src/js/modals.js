@@ -53,6 +53,10 @@ MODALS.handle = {
         let backdrop = MODALS.targets.backdrop;
         if (backdrop.hasClass('opened')) {
             backdrop.find('.modal').slideUp(400, function () {
+                var form = backdrop.find('.modal').find('form');
+                if (form.length > 0)
+                    form[0].reset();
+
                 backdrop.removeClass('opened').fadeOut(300);
                 $('html, body').css('overflow', 'inherit');
             });
