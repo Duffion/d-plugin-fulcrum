@@ -2,3 +2,24 @@
 .d-fulcrum {
     padding: 15px;
 }
+
+.hidden {
+    display: none;
+}
+
+/* Modals */
+
+.modal {
+
+    &-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(55,55,55, 0.5);
+        padding: 2rem;
+        z-index: 9999;
+    }
+
+    padding-top: 15vh;
+
+}
