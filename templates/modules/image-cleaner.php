@@ -1,7 +1,19 @@
 <?php
 
 /* Fulcrum module template - PCS - Product Category Scraper */
+$logs = $args['logs'];
+$args = [
+    'post_type' => 'attachment',
+    'post_status' => 'inherit',
+    'posts_per_page' => -1
+];
 
+$count = new WP_Query($args);
+if ($count->found_posts > 0) {
+    $count = $count->post_count;
+} else {
+    $count = '0';
+}
 ?>
 
 <div class="d-fulcrum__module d-module-container d-ic">
@@ -12,16 +24,16 @@
 
             <div class="col-12-sm gy-5">
                 <h1 class="display-2">Media / Image Cleaner</h1>
-                <p class=""></p>
+                <?php if ($logs) { ?>
+                    <h4>Last Run: <?= date('m-d-Y H:i:s a', $logs['last_run']); ?> | Total Updated: <strong><?= count($logs) - 1; ?></strong> | Total Media: <?= $count; ?></h4>
+                <?php } else { ?>
+                    <h4>Never ran sync</h4>
+                <?php } ?>
             </div>
 
             <div class="col-6 pcr-scraper-rows">
 
-                <div class="results pcr-jobs gy-5">
-                    Target Image:
-                    <br />
-                    <img src="<?= site_url(); ?>/wp-content/plugins/fulcrum/assets/images/image-coming-soon-placeholder.jpg" style="width: 100%; height: auto" />
-                </div>
+
             </div>
         </div>
     </div>

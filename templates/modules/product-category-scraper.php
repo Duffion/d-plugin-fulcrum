@@ -17,21 +17,21 @@ $jobs = $args['jobs'];
                 <p class=""></p>
             </div>
 
-            <div class="col-12 pcr-scraper-rows">
+            <div class="col-12 pcs-scraper-rows">
 
-                <div class="results pcr-jobs gy-5">
+                <div class="results pcs-jobs gy-5">
                     <?php if ($jobs && count($jobs) > 0) {
                         foreach ($jobs as $id => $job) {
                     ?>
-                            <div class="card pcr-jobs-job">
+                            <div class="card pcs-jobs-job">
                                 <div class="card-body">
                                     <h5 class="card-title"><strong><?= $job['search']; ?></strong> Categories - <span><?= implode(' ,', $job['categories']); ?></span></h5>
                                     <p class="card-text">Last Time Job Ran - <strong><?= ($job['last_run'] ? date('m-d-Y h:i a', $job['last_run']) : false) ?></p>
                                 </div>
                                 <div class="card-options">
                                     <div class="btn-group">
-                                        <button class="btn btn-secondary" type="button" data-pcr-action="edit-job" data-modal-trigger="#pcr-add-modal" data-pcr-job='<?= json_encode($job); ?>'>- Edit Job</button>
-                                        <button class="btn btn-warning" type="button" data-pcr-action="remove-job" data-pcr-job="<?= $id; ?>">- Delete Job</button>
+                                        <button class="btn btn-secondary" type="button" data-pcs-action="edit-job" data-modal-trigger="#pcs-add-modal" data-pcs-job='<?= json_encode($job); ?>'>- Edit Job</button>
+                                        <button class="btn btn-warning" type="button" data-pcs-action="remove-job" data-pcs-job="<?= $id; ?>">- Delete Job</button>
                                     </div>
                                 </div>
                             </div>
@@ -47,12 +47,12 @@ $jobs = $args['jobs'];
                     }
                     ?>
                 </div>
-                <div class="col-12 pcr-options gy-5">
+                <div class="col-12 pcs-options gy-5">
                     <div class="btn-group">
-                        <button class="btn btn-success" type="button" data-modal-trigger="#pcr-add-modal">+ Add New Job</button>
-                        <button class="btn btn-secondary" type="button" data-pcr-action="run-jobs">Manually Run Jobs</button>
-                        <button class="btn btn-light" type="button" data-pcr-action="export-jobs">Export Jobs</button>
-                        <button class="btn btn-light" type="button" data-pcr-action="import-jobs">Import Jobs</button>
+                        <button class="btn btn-success" type="button" data-modal-trigger="#pcs-add-modal">+ Add New Job</button>
+                        <button class="btn btn-secondary" type="button" data-pcs-action="run-jobs">Manually Run Jobs</button>
+                        <button class="btn btn-light" type="button" data-pcs-action="export-jobs">Export Jobs</button>
+                        <button class="btn btn-light" type="button" data-pcs-action="import-jobs">Import Jobs</button>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@ $jobs = $args['jobs'];
             // This is how modals need to be formed. You will need to have them wrapped in the modal-backdrop //
             ?>
             <div class="modal-backdrop hidden">
-                <div class="modal" id="pcr-add-modal" tabindex="-1">
+                <div class="modal" id="pcs-add-modal" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -102,7 +102,7 @@ $jobs = $args['jobs'];
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-pcr-action="save-job">Save changes</button>
+                                <button type="button" class="btn btn-primary" data-pcs-action="save-job">Save changes</button>
                             </div>
                         </div>
                     </div>
