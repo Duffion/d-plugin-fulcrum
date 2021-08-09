@@ -84,7 +84,7 @@ class fulcrum_pcs
 
 
         // pull the terms that the user has already put into the system //
-        $jobs = get_option('fulcrum__pcr_jobs');
+        $jobs = get_option('fulcrum__pcs_jobs');
 
         $this->partial('modules', 'product-category-scraper', ['cats' => $product_categories, 'jobs' => $jobs]);
     }
@@ -100,7 +100,7 @@ class fulcrum_pcs
             $categories = $p['target-categories'];
             $id = sanitize_title($search);
 
-            $current = get_option('fulcrum__pcr_jobs');
+            $current = get_option('fulcrum__pcs_jobs');
             if (!$current)
                 $current = [];
 
@@ -113,9 +113,9 @@ class fulcrum_pcs
                 'created' => time()
             ];
 
-            update_option('fulcrum__pcr_jobs', $current);
+            update_option('fulcrum__pcs_jobs', $current);
 
-            $check = get_option('fulcrum__pcr_jobs');
+            $check = get_option('fulcrum__pcs_jobs');
             if ($check) {
                 wp_send_json($check, 200);
             } else {
@@ -128,14 +128,14 @@ class fulcrum_pcs
     {
         $response = ['status' => 'failed'];
         $code = 403;
-        $jobs = get_option('fulcrum__pcr_jobs');
+        $jobs = get_option('fulcrum__pcs_jobs');
         $p = $_POST;
         if (isset($p['id']) && is_admin()) {
             if (isset($jobs[$p['id']])) {
                 unset($jobs[$p['id']]);
                 $response['status'] = 'success';
                 $code = 200;
-                update_option('fulcrum__pcr_jobs', $jobs);
+                update_option('fulcrum__pcs_jobs', $jobs);
             }
         }
         wp_send_json($response, $code);
@@ -166,7 +166,7 @@ class fulcrum_pcs
 
     function update_job($job, $results)
     {
-        $jobs = get_option('fulcrum__pcr_jobs');
+        $jobs = get_option('fulcrum__pcs_jobs');
         foreach ($jobs as $k => $j) {
             if ($k === sanitize_title($job['search']) && $j['search'] === $job['search']) {
                 // its our target. lets update the last run //
@@ -179,14 +179,14 @@ class fulcrum_pcs
                 ];
             }
         }
-        $update = update_option('fulcrum__pcr_jobs', $jobs);
+        $update = update_option('fulcrum__pcs_jobs', $jobs);
 
         return ($update);
     }
 
     function run_jobs()
     {
-        $jobs = get_option('fulcrum__pcr_jobs');
+        $jobs = get_option('fulcrum__pcs_jobs');
         $job = [];
         $time = time();
 
@@ -222,7 +222,7 @@ class fulcrum_pcs
         $query = [
             'post_type' => 'product',
             // 'post_status' => 'publish',
-            'post_per_page' => 15,
+            'post_per_page' => 35,
         ];
         $meta_query = $tax_query = [
             'relation' => 'OR',

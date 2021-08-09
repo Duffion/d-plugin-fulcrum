@@ -24,6 +24,11 @@ class d_crons
             'name' => 'three_minutes',
             'interval' => 180,
             'display' => 'Every Three Minutes'
+        ],
+        [
+            'name' => 'thirty_minutes',
+            'interval' => 1800,
+            'display' => 'Every Thirty Minutes'
         ]
     ];
 

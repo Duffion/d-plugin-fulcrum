@@ -1,19 +1,19 @@
-console.log('PCR Loaded');
+console.log('PCS Loaded');
 let $ = jQuery;
-let PCR = {};
-PCR.targets = {};
-PCR.register = function () {
+let PCS = {};
+PCS.targets = {};
+PCS.register = function () {
 
-    var actions = $('[data-pcr-action]');
+    var actions = $('[data-pcs-action]');
     if (actions) {
-        actions.on('click', PCR.handle.actions);
+        actions.on('click', PCS.handle.actions);
     }
 
 }
 
-PCR.handle = {
+PCS.handle = {
     actions: function () {
-        let action = $(this).data('pcr-action'),
+        let action = $(this).data('pcs-action'),
             uri = window.location.origin + '/wp-admin/admin-ajax.php?action=',
             data = {},
             cb = false;
@@ -29,15 +29,15 @@ PCR.handle = {
                 if (form.length > 0) {
                     data = form.serialize() + '&action=pcs_add_job';
                 }
-                cb = PCR.handle.add_result;
+                cb = PCS.handle.add_result;
                 break;
 
             case 'edit-job':
                 // we need to push the data into the form to edit //
-                var job = $(this).data('pcr-job');
+                var job = $(this).data('pcs-job');
 
                 if (job) {
-                    var form = $('#pcr-add-modal form');
+                    var form = $('#pcs-add-modal form');
                     console.log('form', form);
                     if (form.length > 0) {
                         form.trigger('reset');
@@ -50,17 +50,17 @@ PCR.handle = {
                 break;
 
             case 'remove-job':
-                var job_id = $(this).data('pcr-job'),
+                var job_id = $(this).data('pcs-job'),
                     auri = uri + 'pcs_remove_job';
 
-                cb = PCR.handle.remove_job;
+                cb = PCS.handle.remove_job;
                 data.id = job_id;
                 break;
 
             case 'run-jobs':
                 var auri = uri + 'pcs_run_jobs';
 
-                cb = PCR.handle.run_jobs;
+                cb = PCS.handle.run_jobs;
                 var d = new Date();
 
                 data = { time: d.getTime() };
@@ -86,6 +86,6 @@ PCR.handle = {
 
 
 $(function () {
-    PCR.register();
+    PCS.register();
 
 });
