@@ -38,14 +38,12 @@ if (!class_exists('D_FULCRUM')) :
             'inc' => 'inc',
             'traits' => 'inc/traits',
             'vendors' => 'inc/vendors',
-            'api' => 'inc/api',
             'assets' => 'assets',
             'scripts' => 'assets/js',
             'styles' => 'assets/css',
             'templates' => 'templates',
             'modules' => 'inc/modules',
             'templates-modules' => 'templates/modules',
-            'api' => 'inc/api'
         ];
 
         // [ 'filename without php' => 'name of dir from above config' ] //
