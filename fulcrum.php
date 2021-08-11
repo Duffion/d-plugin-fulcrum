@@ -1,6 +1,13 @@
 <?php
 
+/**
+ *
+ * @package Fulcrum
+ * @version 0.9.7
+ */
+
 namespace D\FULCRUM;
+
 
 /*
  * Plugin Name: Fulcrum - Helper Tool
