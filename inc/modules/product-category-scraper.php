@@ -199,9 +199,7 @@ class fulcrum_pcs
             if ($job) {
                 // we need to run the rules of this job properly //
                 $processed = $this->process_job($job);
-                // wpp($processed);
                 // we need to add the log to the job history as well update the options //
-
                 $updated = $this->update_job($job, $processed);
 
                 if ($processed) {
@@ -221,7 +219,6 @@ class fulcrum_pcs
 
         $query = [
             'post_type' => 'product',
-            // 'post_status' => 'publish',
             'post_per_page' => 35,
         ];
         $meta_query = $tax_query = [

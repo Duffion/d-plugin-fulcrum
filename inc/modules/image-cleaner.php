@@ -65,9 +65,7 @@ class fulcrum_ic
 
     function view_ic()
     {
-        // $this->run_cleaner();
         $logs = get_option('fulcrum_ic_logs');
-        // var_dump($logs);
         $this->partial('modules', 'image-cleaner', ['logs' => $logs]);
     }
 
@@ -134,7 +132,6 @@ class fulcrum_ic
         if (!$logs) $logs = [];
 
         $logs['last_run'] = time();
-        // wpp($products);
         if ($products->found_posts > 0) {
             $return = [];
             foreach ($products->posts as $product) {

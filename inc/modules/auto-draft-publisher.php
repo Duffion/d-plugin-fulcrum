@@ -73,8 +73,6 @@ class fulcrum_adp
     function register_cron()
     {
         add_action('adp__run_job', [$this, 'adp_cron']);
-        // wpp($this->cron) . die;
-        // $this->cron->print_tasks();
         $this->cron->schedule('adp__run_job', 'five_minutes');
     }
 
@@ -90,9 +88,6 @@ class fulcrum_adp
 
     function view_adp()
     {
-        // echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
-        // echo '<h2>Fulcrum Module - Auto Draft Publisher</h2>';
-        // echo '</div>';
         // We need to include the partial template using our template trait and output it here //
         $this->partial('modules', 'auto-draft-publisher', ['cats' => $this->get_product_cats()]);
     }
@@ -150,9 +145,6 @@ class fulcrum_adp
 
             // Update the categories option in the database
             update_option('fulcrum_adp_categories', $updated_cats);
-
-            // Call the adp cron function to auto-publish all drafts in the selected categories
-            // $count = $this->adp_cron();
 
             // Redirect back to the module page with a success message
             wp_redirect(admin_url('admin.php?page=module-adp&response=success'));

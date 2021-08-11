@@ -50,11 +50,15 @@ PCS.handle = {
                 break;
 
             case 'remove-job':
-                var job_id = $(this).data('pcs-job'),
-                    auri = uri + 'pcs_remove_job';
+                if (confirm('By deleting the job you will NOT be deleting the categories / tags it has made, are you sure you wish to delete the job?')) {
+                    var job_id = $(this).data('pcs-job'),
+                        auri = uri + 'pcs_remove_job';
 
-                cb = PCS.handle.remove_job;
-                data.id = job_id;
+                    cb = PCS.handle.remove_job;
+                    data.id = job_id;
+                } else {
+                    return;
+                }
                 break;
 
             case 'run-jobs':
