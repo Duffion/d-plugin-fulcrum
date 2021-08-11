@@ -38,12 +38,14 @@ if (!class_exists('D_FULCRUM')) :
             'inc' => 'inc',
             'traits' => 'inc/traits',
             'vendors' => 'inc/vendors',
+            'api' => 'inc/api',
             'assets' => 'assets',
             'scripts' => 'assets/js',
             'styles' => 'assets/css',
             'templates' => 'templates',
             'modules' => 'inc/modules',
             'templates-modules' => 'templates/modules',
+            'api' => 'inc/api'
         ];
 
         // [ 'filename without php' => 'name of dir from above config' ] //
@@ -99,7 +101,7 @@ if (!class_exists('D_FULCRUM')) :
         {
             global $d_plugin_dirs;
 
-            $this->dirs['plugin'] = plugin_dir_path(__FILE__);
+            $this->dirs['plugin'] = rtrim(plugin_dir_path(__FILE__), '/');
 
             $d_plugin_dirs = $this->dirs;
         }
