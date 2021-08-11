@@ -33,6 +33,7 @@ if ($count->found_posts > 0) {
 
             <div class="col-6 pcr-scraper-rows">
 
+                History of updated posts
 
             </div>
         </div>
