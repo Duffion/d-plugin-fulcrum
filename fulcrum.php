@@ -101,7 +101,7 @@ if (!class_exists('D_FULCRUM')) :
         {
             global $d_plugin_dirs;
 
-            $this->dirs['plugin'] = ABSPATH . 'wp-content/plugins/fulcrum';
+            $this->dirs['plugin'] = plugin_dir_path(__FILE__);
 
             $d_plugin_dirs = $this->dirs;
         }
