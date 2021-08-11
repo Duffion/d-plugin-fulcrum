@@ -92,8 +92,7 @@ trait PRIME
                 $dir = $d_plugin_dirs['plugin'] . '/' . $d_plugin_dirs[$ns];
                 $scan = scandir($dir);
 
-                if ($scan && count($scan) > 0) {
-
+                if ($scan && count($scan) > 0 && $dir !== $d_plugin_dirs['plugin'] . '/') {
                     foreach ($scan as $i => $file) {
                         if ($file !== '.' && $file !== '..' && $file !== '.git' && $file !== '' && file_exists($dir . '/' . $file)) {
                             require_once $dir . '/' . $file;
