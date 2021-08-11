@@ -6,7 +6,7 @@ namespace D\FULCRUM;
  * Plugin Name: Fulcrum - Helper Tool
  * Plugin URI: https://duffion.com
  * Description: This is the custom built tool that allows for modular helper tools for Fulcrum Synced sites
- * Version: 0.9.4
+ * Version: 0.9.6
  * Author: Chris "Duffs" Crevling
  * Text Domain: fulcrum-pos
  * Author URI: https://duffion.com
@@ -26,7 +26,7 @@ if (!class_exists('D_FULCRUM')) :
     class D_FULCRUM
     {
 
-        var $version = '0.9.4';
+        var $version = '0.9.6';
 
         public $settings = [];
 
@@ -73,6 +73,7 @@ if (!class_exists('D_FULCRUM')) :
             // Lets create a global instance to make sure we only load items not already loaded //
             $d_loaded = [];
             $d_instance = (!isset($d_instance) ? [] : $d_instance);
+            $this->_define();
 
             require_once $this->dirs['plugin'] . '/' . $this->dirs['inc'] . '/util.php';
             require_once $this->dirs['plugin'] . '/' . $this->dirs['traits'] . '/d-primary.php';
