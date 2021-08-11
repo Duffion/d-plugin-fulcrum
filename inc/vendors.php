@@ -12,7 +12,7 @@ class d_vendor
     // Vendor Vars / Configs //
     var $vendors = [
             'plugin-update-checker' => [
-                'dir' => 'plugin-update-checker/',
+                'dir' => 'plugin-update-checkers/',
             ],
             'meta-box' => [
                 'dir' => 'meta-box/'
