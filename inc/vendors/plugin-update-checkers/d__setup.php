@@ -20,4 +20,4 @@ $update_checker->setBranch($config['target_branch']);
 //Optional: If you're using a private repository, specify the access token like this:
 // $update_checker->setAuthentication($config['auth_token']);
 
-$d__plugin_info = $update_checker->getVcsApi()->enableReleaseAssets();
+// $d__plugin_info = $update_checker->getVcsApi()->enableReleaseAssets();
