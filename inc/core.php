@@ -13,7 +13,7 @@ class d_core
 
     // [ 'directory-namespace' => 'directory folder' ]
     private $auto_dirs = [
-        'modules', 'api', 'vendors'
+        'modules', 'api'
     ];
 
     function __construct()
@@ -49,7 +49,7 @@ class d_core
         $menu = [
             'primary' => [
                 'page_title' => __('Fulcrum Helper Modules - Dashboard', 'd-text'),
-                'menu_title' => 'Dashboard',
+                'menu_title' => 'Fulcrum',
                 'capability' => 'manage_options',
                 'menu_slug' => 'fulcrum',
                 'function' => 'view_dashboard',

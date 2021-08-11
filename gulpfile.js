@@ -41,7 +41,7 @@ gulp.task('sass', () => {
 });
 
 gulp.task('js', () => {
-    return gulp.src(['assets/src/js/**/*.js'], { since: gulp.lastRun('js') })
+    return gulp.src(['assets/src/js/**/*.js'])
         .pipe(plumber())
         .pipe(webpack({
             mode: 'production'

@@ -95,7 +95,7 @@ trait PRIME
                 if ($scan && count($scan) > 0) {
 
                     foreach ($scan as $i => $file) {
-                        if ($file !== '.' && $file !== '..' && $file !== '' && file_exists($dir . '/' . $file)) {
+                        if ($file !== '.' && $file !== '..' && $file !== '.git' && $file !== '' && file_exists($dir . '/' . $file)) {
                             require_once $dir . '/' . $file;
                         }
                     }

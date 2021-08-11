@@ -1,4 +1,7 @@
+@import "../vendors/bootstrap-5.0.2/scss/bootstrap.scss";
+
 @import "includes/variables";                   // <------- Add your variables into this file.
 
 @import "includes/core";
 @import "includes/forms";
+@import "includes/adr";

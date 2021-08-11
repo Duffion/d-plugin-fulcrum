@@ -1,0 +1,30 @@
+{
+	"name": "Fulcrum - API Helper",
+	"version": "0.0.1",
+	"download_url": "https://fulcrum.duffion.com/updates/fulcrum-release.zip",
+	"homepage": "https://fulcrum.duffion.com",
+	"requires": "4.5",
+	"tested": "4.8",
+	"last_updated": "0",
+	"upgrade_notice": "Update your plugin to keep current with the current changes and updates...",
+	"author": "[D]uffion - mcDuffs",
+	"author_homepage": "https://duffion.com",
+	"sections": {
+		"description": "Fulcrum plugin will help complete some tasks that the api can not handle.",
+		"installation": "Download then Activate Plugin",
+		"changelog": "Changelog. <p>Initial Build</p>",
+		"custom_section": "This is a custom section labeled 'Custom Section'."
+	},
+	"icons": {
+		"1x": "http://w-shadow.com/files/external-update-example/assets/icon-128x128.png",
+		"2x": "http://w-shadow.com/files/external-update-example/assets/icon-256x256.png"
+	},
+	"banners": {
+		"low": "http://w-shadow.com/files/external-update-example/assets/banner-772x250.png",
+		"high": "http://w-shadow.com/files/external-update-example/assets/banner-1544x500.png"
+	},
+	"rating": 0,
+	"num_ratings": 0,
+	"downloaded": 0,
+	"active_installs": 0
+}
