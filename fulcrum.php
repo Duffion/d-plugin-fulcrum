@@ -22,6 +22,7 @@ namespace D\FULCRUM;
  */
 
 
+
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 if (!class_exists('D_FULCRUM')) :
@@ -38,6 +39,8 @@ if (!class_exists('D_FULCRUM')) :
         public $settings = [];
 
         public $modules = [];
+
+        private $updater = [];
 
         public $dirs = [
             'partials' => 'templates/partials',
@@ -70,6 +73,25 @@ if (!class_exists('D_FULCRUM')) :
             $this->_define();
         }
 
+        function _git_updater()
+        {
+            require $this->dirs['plugin'] . '/' . $this->dirs['vendors'] . '/plugin-update-checkers/plugin-update-checker.php';
+
+            $config = [
+                'git' => 'https://github.com/Duffion/d-plugin-fulcrum/',
+                'target_branch' => 'production'
+            ];
+
+            $this->updater = \Puc_v4_Factory::buildUpdateChecker(
+                $config['git'],
+                __FILE__,
+                'fulcrum'
+            );
+
+            //Set the branch that contains the stable release.
+            $this->updater->setBranch($config['target_branch']);
+        }
+
         /**
          * _load - []
          * We need to load in all the required core files / traits
@@ -87,6 +109,8 @@ if (!class_exists('D_FULCRUM')) :
             require_once $this->dirs['plugin'] . '/' . $this->dirs['traits'] . '/d-templates.php';
             require_once $this->dirs['plugin'] . '/' . $this->dirs['inc'] . '/d-crons.php';
             require_once $this->dirs['plugin'] . '/' . $this->dirs['inc'] . '/vendors.php';
+
+            $this->_git_updater();
 
             // Lets now load in our other flies with the util loader //
             if ($this->_loading && count($this->_loading) > 0) {
