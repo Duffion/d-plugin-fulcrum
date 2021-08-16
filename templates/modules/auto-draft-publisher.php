@@ -2,6 +2,7 @@
 if (!isset($args['cats'])) return;
 /* Fulcrum module template - PCS - Product Category Scraper */
 $cats = $args['cats'];
+$nonce = (isset($args['nonce']) ? $args['nonce'] : false);
 ?>
 
 <div class="d-fulcrum__module d-module-container d-pcs container px-4">
@@ -21,13 +22,14 @@ $cats = $args['cats'];
         </div>
         <?php
         if (current_user_can('edit_posts')) {
-            $adp_nonce = wp_create_nonce('adp_category_nonce');
             $global_cats = get_option('fulcrum_adp_categories');
         ?>
             <div class="d-fulcrum__module--list d-fulcrum__form toggle">
                 <form id="global-category-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="POST">
                     <input type="hidden" name="action" value="adp_category_response" />
-                    <input type="hidden" name="adp_category_nonce" value="<?php echo $adp_nonce; ?>" />
+                    <?php if ($nonce) { ?>
+                        <input type="hidden" name="fulcrum_nonce" value="<?php echo $fulcrum_nonce; ?>" />
+                    <?php } ?>
                     <div class="col-12 pcr-options gy-5">
                         <div class="btn-group">
                             <button class="btn btn-primary" type="button" data-pcr-action="adp-select-all">+ Select All</button>

@@ -55,6 +55,41 @@ class fulcrum_pcs
 
     function _define()
     {
+        $this->validations = [
+            // [
+            //     'type' => 'required',
+            //     'expected' => [
+            //         'fulcrum_nonce', 'target-text', 'categories', 'action'
+            //     ]
+            // ],
+            [
+                'key' => 'target-text',
+                'rules' => [
+                    'not_empty' => true,
+                    'required' => true
+                ]
+            ],
+            [
+                'key' => 'fulcrum_nonce',
+                'rules' => [
+                    'required' => true,
+                    'not_empty' => true
+                ]
+            ],
+            [
+                'key' => 'target-categories',
+                'rules' => [
+                    'required' => true,
+                    'is_array' => true,
+                    'not_empty' => true,
+                ],
+                'append' => '[]'
+            ],
+            [
+                'key' => 'create-category-toggle',
+            ]
+        ];
+
         $this->menu_item = [
             'parent_slug' => 'fulcrum',
             'page_title' => 'Fulcrum Module - Product Category Scraper',
@@ -82,44 +117,48 @@ class fulcrum_pcs
         );
         $product_categories = get_terms($args);
 
-
+        $nonce = $this->create_nonce();
         // pull the terms that the user has already put into the system //
         $jobs = get_option('fulcrum__pcs_jobs');
 
-        $this->partial('modules', 'product-category-scraper', ['cats' => $product_categories, 'jobs' => $jobs]);
+        $this->partial('modules', 'product-category-scraper', ['cats' => $product_categories, 'jobs' => $jobs, 'nonce' => $nonce]);
     }
 
     function ajax__add_job()
     {
+
         $response = [];
-        $p = $_POST;
+        // use the normalized trait function to process our input and validate it //
+        $p = $this->validate_request(true); // This will end the request upon failure //
+        if ($p && !empty($p)) {
 
-        if (isset($p['target-text']) && isset($p['target-categories']) && is_admin()) {
-            $search = sanitize_text_field($p['target-text']);
-            $create_cat = isset($p['create-category-toggle']) ? (bool) $p['create-category-toggle'] : false;
-            $categories = $p['target-categories'];
-            $id = sanitize_title($search);
+            if (isset($p['target-text']) && isset($p['target-categories[]']) && is_admin()) {
+                $search = sanitize_text_field($p['target-text']);
+                $create_cat = isset($p['create-category-toggle']) ? (bool) $p['create-category-toggle'] : false;
+                $categories = $p['target-categories[]'];
+                $id = sanitize_title($search);
 
-            $current = get_option('fulcrum__pcs_jobs');
-            if (!$current)
-                $current = [];
+                $current = get_option('fulcrum__pcs_jobs');
+                if (!$current)
+                    $current = [];
 
-            $current[$id] = [
-                'search' => $search,
-                'create_cat' => $create_cat,
-                'categories' => $categories,
-                'logs' => [],
-                'last_run' => 0,
-                'created' => time()
-            ];
+                $current[$id] = [
+                    'search' => $search,
+                    'create_cat' => $create_cat,
+                    'categories' => $categories,
+                    'logs' => [],
+                    'last_run' => 0,
+                    'created' => time()
+                ];
 
-            update_option('fulcrum__pcs_jobs', $current);
+                update_option('fulcrum__pcs_jobs', $current);
 
-            $check = get_option('fulcrum__pcs_jobs');
-            if ($check) {
-                wp_send_json($check, 200);
-            } else {
-                wp_send_json(['message' => 'failed'], 403);
+                $check = get_option('fulcrum__pcs_jobs');
+                if ($check) {
+                    wp_send_json($check, 200);
+                } else {
+                    wp_send_json(['message' => 'failed'], 403);
+                }
             }
         }
     }

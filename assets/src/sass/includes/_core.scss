@@ -23,3 +23,69 @@
     padding-top: 15vh;
 
 }
+
+
+/* Global Module */
+
+.d-fulcrum__module {
+
+    &--inner {
+
+        .results {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            padding: 15px;
+
+            .card {
+                width: 33%;
+
+                &-body {
+
+                }
+
+                &-title {
+
+                }
+
+                &-text {
+
+                    .card-selection-title {
+
+                    }
+
+                    ul {
+                        &.list-inline {
+                            position: relative;
+                            width: 100%;
+
+                            .expand {
+                                width: 100%;
+                                text-align: center;
+
+                                a {
+
+                                }
+                            }
+
+                            &.small {
+                                overflow-y: hidden;
+                                height: 150px;
+                                border-bottom: 2px solid #000;
+
+                                .expand {
+                                    position: absolute;
+                                    bottom:0;
+                                    left: 0;
+
+                                }
+                            }
+
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

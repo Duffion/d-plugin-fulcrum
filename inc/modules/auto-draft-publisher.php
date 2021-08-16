@@ -21,7 +21,7 @@ class fulcrum_adp
 
     use D_PRIME, D_TEMPLATES;
 
-    var $menu_item = [];
+    var $menu_item = [], $validations = [];
 
     private $meta_boxes = [];
 
@@ -89,7 +89,7 @@ class fulcrum_adp
     function view_adp()
     {
         // We need to include the partial template using our template trait and output it here //
-        $this->partial('modules', 'auto-draft-publisher', ['cats' => $this->get_product_cats()]);
+        $this->partial('modules', 'auto-draft-publisher', ['cats' => $this->get_product_cats(), 'nonce' => $this->create_nonce()]);
     }
 
     function adp_cron()
