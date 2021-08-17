@@ -3,6 +3,7 @@
 /* Fulcrum module template - PCS - Product Category Scraper */
 $cats = $args['cats'];
 $jobs = $args['jobs'];
+$nonce = (isset($args['nonce']) ? $args['nonce'] : false);
 // wpp($args['jobs']);
 ?>
 
@@ -18,20 +19,65 @@ $jobs = $args['jobs'];
             </div>
 
             <div class="col-12 pcs-scraper-rows">
+                <div class="pcs-actions-bar">
+                    <div class="col-12 pcs-options gy-5">
+                        <h3>Actions:</h3>
+                        <div class="btn-group">
+                            <button class="btn btn-success" type="button" data-modal-trigger="#pcs-add-modal">+ Add New Job</button>
+                            <button class="btn btn-secondary" type="button" data-fulcrum-action="run-jobs">Manually Run Jobs</button>
+                            <button class="btn btn-light" type="button" data-fulcrum-action="export-jobs">Export Jobs</button>
+                            <button class="btn btn-light" type="button" data-fulcrum-action="import-jobs">Import Jobs</button>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="results pcs-jobs gy-5">
                     <?php if ($jobs && count($jobs) > 0) {
                         foreach ($jobs as $id => $job) {
+                            // wpp($job) . die;
+                            $last_run = ($job['last_run'] ? date('m-d-Y h:i a', $job['last_run']) : false);
                     ?>
                             <div class="card pcs-jobs-job">
                                 <div class="card-body">
-                                    <h5 class="card-title"><strong><?= $job['search']; ?></strong> Categories - <span><?= implode(' ,', $job['categories']); ?></span></h5>
-                                    <p class="card-text">Last Time Job Ran - <strong><?= ($job['last_run'] ? date('m-d-Y h:i a', $job['last_run']) : false) ?></p>
+                                    <h4 class="card-title">Search Term:<strong><?= $job['search']; ?></strong></h4>
+                                    <div class="card-text">
+                                        <div class="alert alert-<?= ($last_run ? 'success' : 'info'); ?>">
+                                            <?= ($last_run ? 'Last Time Job Ran - <strong>' . $last_run . '</strong>' : 'Job has <b>Never</b> been ran.'); ?>
+                                        </div>
+                                    </div>
+                                    <div class="card-text">
+                                        <h5 class="card-section-title">Categories (<?= count($job['categories']) ?>):</h5>
+                                        <?php
+                                        if (isset($job['categories']) && !empty($job['categories'])) {
+                                        ?>
+                                            <ul class="list-inline small">
+                                                <?php
+                                                foreach ($job['categories'] as $cat_id) {
+                                                    $category = get_term_by('ID', $cat_id, 'product_cat');
+
+                                                    $name = ($category && isset($category->name)) ? $category->name : 'Term not Found';
+                                                ?>
+                                                    <li class="list-inline-item btn btn-info">
+                                                        <?= $name; ?>
+                                                    </li>
+                                                <?php
+                                                }
+                                                if (count($job['categories']) > 5) {
+                                                ?>
+                                                    <li class="expand">
+                                                        <a href="javascript: void(0);" class="btn btn-dark" data-fulcrum-action="expand-list">Expand</a>
+                                                    </li>
+                                                <?php } ?>
+                                            </ul>
+                                        <?php
+                                        }
+                                        ?>
+                                    </div>
                                 </div>
                                 <div class="card-options">
                                     <div class="btn-group">
-                                        <button class="btn btn-secondary" type="button" data-pcs-action="edit-job" data-modal-trigger="#pcs-add-modal" data-pcs-job='<?= json_encode($job); ?>'>- Edit Job</button>
-                                        <button class="btn btn-warning" type="button" data-pcs-action="remove-job" data-pcs-job="<?= $id; ?>">- Delete Job</button>
+                                        <button class="btn btn-secondary" type="button" data-fulcrum-action="edit-job" data-modal-trigger="#pcs-add-modal" data-fulcrum-job='<?= json_encode($job); ?>'>- Edit Job</button>
+                                        <button class="btn btn-warning" type="button" data-fulcrum-action="remove-job" data-fulcrum-job="<?= $id; ?>">- Delete Job</button>
                                     </div>
                                 </div>
                             </div>
@@ -47,14 +93,7 @@ $jobs = $args['jobs'];
                     }
                     ?>
                 </div>
-                <div class="col-12 pcs-options gy-5">
-                    <div class="btn-group">
-                        <button class="btn btn-success" type="button" data-modal-trigger="#pcs-add-modal">+ Add New Job</button>
-                        <button class="btn btn-secondary" type="button" data-pcs-action="run-jobs">Manually Run Jobs</button>
-                        <button class="btn btn-light" type="button" data-pcs-action="export-jobs">Export Jobs</button>
-                        <button class="btn btn-light" type="button" data-pcs-action="import-jobs">Import Jobs</button>
-                    </div>
-                </div>
+
             </div>
             <?php
             // This is how modals need to be formed. You will need to have them wrapped in the modal-backdrop //
@@ -69,6 +108,9 @@ $jobs = $args['jobs'];
                             </div>
                             <div class="modal-body">
                                 <form class="row g-3 d-fulcrum__form">
+                                    <?php if ($nonce) { ?>
+                                        <input type="hidden" name="fulcrum_nonce" value="<?= $nonce; ?>" />
+                                    <?php } ?>
                                     <div class="col-auto">
                                         <label for="targetText" class="hidden">Search Text</label>
                                         <input type="text" name="target-text" class="form-control-plaintext" id="targetText" value="" placeholder="Search Text...">
@@ -102,7 +144,7 @@ $jobs = $args['jobs'];
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" data-pcs-action="save-job">Save changes</button>
+                                <button type="button" class="btn btn-primary" data-fulcrum-action="save-job">Save changes</button>
                             </div>
                         </div>
                     </div>
