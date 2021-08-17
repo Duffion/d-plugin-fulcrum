@@ -47,6 +47,29 @@ MODULES.handle = {
 
         }
         switch (action) {
+            case 'select-all':
+                let $t = $(this);
+                var target = $($t.data('fulcrum-target')),
+                    option = $t.data('fulcrum-option');
+                console.log('target', target);
+                if (target.length > 0) {
+                    option = $t.data('fulcrum-option');
+                    target.each(function (k, v) {
+                        if (!$(this).hasClass('selected')) {
+                            $(this).addClass('selected').find('input').prop('checked', true);
+                            if (option !== 'deselect') {
+                                $t.data('fulcrum-option', 'deselect').html('- Deselect All');
+                            }
+                        } else if (option === 'deselect') {
+                            // deselect all //
+                            $(this).removeClass('selected').find('input').prop('checked', false);
+                            if (option == 'deselect') {
+                                $t.data('fulcrum-option', 'select').html('+ Select All');
+                            }
+                        }
+                    });
+                }
+                break;
             case 'save-job':
                 // gather form data and send to ajax function to save job
                 console.log('saving job');

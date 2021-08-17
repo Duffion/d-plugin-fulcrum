@@ -1,0 +1,45 @@
+
+.d-adp {
+
+        .d-fulcrum {
+
+            &__module {
+
+                &--inner {
+
+                    .list-group {
+
+                        &-item {
+                            border: none;
+                            padding: 15px;
+
+
+                            label {
+                                border: 1px solid #ccc;
+                                padding: 25px;
+                                padding-left: 10px;
+                            }
+
+                            &.selected {
+
+                                label {
+                                    background: rgba(63, 127, 191, 0.15);
+                                    display: flex;
+                                    flex-direction: row;
+                                    align-content: center;
+                                    justify-content: center;
+
+                                    .form-switch {
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        min-height: inherit;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+}

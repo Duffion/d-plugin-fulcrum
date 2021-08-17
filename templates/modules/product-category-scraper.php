@@ -19,6 +19,17 @@ $nonce = (isset($args['nonce']) ? $args['nonce'] : false);
             </div>
 
             <div class="col-12 pcs-scraper-rows">
+                <div class="pcs-actions-bar">
+                    <div class="col-12 pcs-options gy-5">
+                        <h3>Actions:</h3>
+                        <div class="btn-group">
+                            <button class="btn btn-success" type="button" data-modal-trigger="#pcs-add-modal">+ Add New Job</button>
+                            <button class="btn btn-secondary" type="button" data-fulcrum-action="run-jobs">Manually Run Jobs</button>
+                            <button class="btn btn-light" type="button" data-fulcrum-action="export-jobs">Export Jobs</button>
+                            <button class="btn btn-light" type="button" data-fulcrum-action="import-jobs">Import Jobs</button>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="results pcs-jobs gy-5">
                     <?php if ($jobs && count($jobs) > 0) {
@@ -82,14 +93,7 @@ $nonce = (isset($args['nonce']) ? $args['nonce'] : false);
                     }
                     ?>
                 </div>
-                <div class="col-12 pcs-options gy-5">
-                    <div class="btn-group">
-                        <button class="btn btn-success" type="button" data-modal-trigger="#pcs-add-modal">+ Add New Job</button>
-                        <button class="btn btn-secondary" type="button" data-fulcrum-action="run-jobs">Manually Run Jobs</button>
-                        <button class="btn btn-light" type="button" data-fulcrum-action="export-jobs">Export Jobs</button>
-                        <button class="btn btn-light" type="button" data-fulcrum-action="import-jobs">Import Jobs</button>
-                    </div>
-                </div>
+
             </div>
             <?php
             // This is how modals need to be formed. You will need to have them wrapped in the modal-backdrop //

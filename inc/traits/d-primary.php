@@ -243,9 +243,22 @@ trait PRIME
             if (isset($this->validations) && !empty($this->validations)) {
                 foreach ($this->validations as $validation) {
 
-                    if (isset($validation['key']) && $validation['key'] !== '') {
+                    $value = (isset($_data[$validation['key']]) ? $_data[$validation['key']] : false);
+                    if (isset($validation['multi']) && $validation['multi']) {
+                        // find all the matching submissions //
+                        $value[$validation['key']] = [];
+                        foreach ($_data as $ns => $val) {
+                            $key = (strpos($ns, $validation['key']) !== false ? $ns : false);
+                            if ($key) {
+                                $x = explode('-', $key);
+                                $id = $x[count($x) - 1];
+                                $value[$validation['key']][$id] = $val;
+                            }
+                        }
+                    }
+
+                    if ((isset($validation['key']) && $validation['key'] !== '')) {
                         // if there is a rule set then check it otherwise if not empty it passes //
-                        $value = (isset($_data[$validation['key']]) ? $_data[$validation['key']] : false);
                         $error['field'] = $validation['key'];
                         $error['message'] = 'Validation of input fields has failed. Please check the data submitted. Field: "' . $validation['key'] . '"';
 
@@ -294,6 +307,8 @@ trait PRIME
                             }
                         } else if (isset($_data[$validation['key']])) {
                             $values[$validation['key']] = $this->sanitizer($_data[$validation['key']]);
+                        } else if (!isset($_data[$validation['key']]) && isset($validation['multi']) && $validation['multi'] && isset($value[$validation['key']])) {
+                            $values[$validation['key']] = $value[$validation['key']];
                         }
                     }
                 }
