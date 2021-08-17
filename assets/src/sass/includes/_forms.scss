@@ -7,6 +7,26 @@
         }
     }
 
+    .invalid {
+
+        background: rgba(170, 50, 50, .35) !important;
+
+        &:before {
+            content: '* Please fill out / make a selection for this field';
+            font-size: 16px;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            padding: 10px;
+            color: #EE2424;
+        }
+        label {
+            font-weight: bold;
+            color: #EE2424;
+        }
+
+    }
+
     .form-switch {
         .form-check-input {
             width: 15px;

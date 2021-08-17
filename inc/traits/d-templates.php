@@ -21,4 +21,9 @@ trait TEMPLATES
     function start()
     {
     }
+
+    function create_nonce()
+    {
+        return wp_create_nonce('fulcrum_nonce');
+    }
 }
