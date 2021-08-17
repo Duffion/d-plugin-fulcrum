@@ -21,7 +21,7 @@ class fulcrum_adp
 
     use D_PRIME, D_TEMPLATES;
 
-    var $menu_item = [];
+    var $menu_item = [], $validations = [];
 
     private $meta_boxes = [];
 
@@ -45,6 +45,20 @@ class fulcrum_adp
 
     function _define()
     {
+        $this->validations = [
+            [
+                'key' => 'fulcrum_nonce',
+                'rules' => [
+                    'required' => true,
+                    'not_empty' => true,
+                ]
+            ],
+            [
+                'key' => 'd--toggle-',
+                'multi' => true,
+            ]
+        ];
+
         $this->menu_item = [
             'parent_slug' => 'fulcrum',
             'page_title' => 'Fulcrum Module - Auto Draft Publisher',
@@ -89,7 +103,7 @@ class fulcrum_adp
     function view_adp()
     {
         // We need to include the partial template using our template trait and output it here //
-        $this->partial('modules', 'auto-draft-publisher', ['cats' => $this->get_product_cats()]);
+        $this->partial('modules', 'auto-draft-publisher', ['cats' => $this->get_product_cats(), 'nonce' => $this->create_nonce()]);
     }
 
     function adp_cron()
@@ -132,13 +146,15 @@ class fulcrum_adp
 
     public function handle_category_form()
     {
-        if (isset($_POST['adp_category_nonce']) && wp_verify_nonce($_POST['adp_category_nonce'], 'adp_category_nonce')) {
+        // wpp($_POST);
+        $p = $this->validate_request(false);
+        if ($p && !empty($p)) {
             $updated_cats = [];
 
             $product_cats = $this->get_product_cats();
             foreach ($product_cats as $cat) {
-                $id = 'd--toggle-' . $cat->term_id;
-                if (isset($_POST[$id]) && $_POST[$id] == 'on') {
+                $id = 'd--toggle-';
+                if (isset($p[$id][$cat->term_id]) && $p[$id][$cat->term_id] == 'on') {
                     $updated_cats[] = $cat->term_id;
                 }
             }
