@@ -65,8 +65,8 @@ trait PRIME
                             $sub_item['capability'],
                             $sub_item['menu_slug'],
                             (!is_array($sub_item['function']) ? [$that, $sub_item['function']] : $sub_item['function']),
+                            (isset($sub_item['position']) ? $sub_item['position'] : 40),
                             (isset($sub_item['icon_url']) ? $sub_item['icon_url'] : ''),
-                            (isset($sub_item['position']) ? $sub_item['position'] : NULL)
                         );
                     }
                 }
