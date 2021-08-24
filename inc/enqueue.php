@@ -21,13 +21,13 @@ class d_enqueue
     function _define()
     {
         $this->actions = [
-            'add_admin_styles' => [
+            'add_admin_scripts_styles' => [
                 'function' => 'admin_styles',
                 'hook' => 'admin_enqueue_scripts'
             ],
-            'add_admin_scripts' => [
-                'function' => 'admin_scripts',
-                'hook' => 'admin_enqueue_scripts'
+            'wp_register_script' => [
+                'function' => 'register',
+                'hook' => 'wp_register_script'
             ],
         ];
 
@@ -38,12 +38,7 @@ class d_enqueue
                     'deps' => ['jquery', 'jquery-ui-core']
                 ],
                 'version' => '0.0.1',
-            ],
-            // 'bootstrap-5' => [
-            //     'file_name' => 'vendors/bootstrap/bootstrap.min.js',
-            //     'params' => [],
-            //     'version' => '5.0.2'
-            // ]
+            ]
         ];
 
         $this->styles = [
@@ -66,7 +61,7 @@ class d_enqueue
 
     function init()
     {
-        $this->register();
+        // $this->register();
     }
 
     private function _reg($type, $objs = [])
@@ -101,13 +96,9 @@ class d_enqueue
         }
     }
 
-    public function admin_scripts()
+    public function admin_scripts_styles()
     {
         $this->_admin_('scripts');
-    }
-
-    public function admin_styles()
-    {
         $this->_admin_('styles');
     }
 
