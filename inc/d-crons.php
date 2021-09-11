@@ -21,6 +21,11 @@ class d_crons
             'display' => 'Every Five Minutes'
         ],
         [
+            'name' => 'one_minute',
+            'interval' => 60,
+            'display' => 'Every Minute'
+        ],
+        [
             'name' => 'three_minutes',
             'interval' => 180,
             'display' => 'Every Three Minutes'
@@ -88,8 +93,25 @@ class d_crons
             // it is scheduled lets see if we have to update the call //
 
         } else {
+            // lets make sure we register the hook into our options for removal later //
+            $actions = get_option('fulcrum_cron_actions');
+            if (!$actions) $actions = [];
+
+            $actions[$action] = $action;
+            update_option('fulcrum_cron_actions', $actions);
             // schedule the unscheduled hook //
             wp_schedule_event(current_time('timestamp'), $frequency, $action);
+        }
+    }
+
+    function unschedule_hooks()
+    {
+        $actions = get_option('fulcrum_cron_actions');
+
+        if ($actions && count($actions) > 0) {
+            foreach ($actions as $action) {
+                wp_unschedule_hook($action);
+            }
         }
     }
 

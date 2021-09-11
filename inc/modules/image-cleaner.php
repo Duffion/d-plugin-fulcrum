@@ -59,8 +59,14 @@ class fulcrum_ic
 
     function register_cron()
     {
+
+        // lets force a log reset //
+        $reset_logs = get_option('fulcrum_ic_reset');
+        if (!$reset_logs || $reset_logs !== 'done')
+            update_option('fulcrum_ic_reset', true);
+
         add_action('ic__run_cleaner', [$this, 'run_cleaner']);
-        $this->cron->schedule('ic__run_cleaner', 'three_minutes');
+        $this->cron->schedule('ic__run_cleaner', 'one_minute');
     }
 
     function view_ic()
@@ -71,101 +77,179 @@ class fulcrum_ic
 
     function check_name($name)
     {
-        $x = explode('-', $name);
-        if (count($x) > 1) {
-            $check = is_numeric($x[count($x) - 1]);
+        $output = [
+            'name' => $name,
+            'number' => false,
+            'ext' => false
+        ];
 
-            if ($check) {
-                return ['name' => $x[0], 'number' => $x[count($x) - 1]];
+        $x = explode('-', $name);
+        if (count($x) >= 1) {
+            // We need to cycle through the explosion in order to see if this is an origional //
+            foreach ($x as $i => $part) {
+                if ($i === 0) {
+                    $output['name'] = $part;
+                } else {
+                    if (in_array($part, ['jpg', 'gif', 'png', 'jpeg'])) {
+                        $output['ext'] = $part;
+                    } else {
+                        if (is_numeric($part))
+                            $output['number'] = $part;
+                        else
+                            $output['is_origional'] = true;
+                    }
+                }
+            }
+
+            if (count($x) === 2) {
+                $output['is_origional'] = true;
             }
         }
-        return false;
+
+        return $output;
     }
 
-    function find_origional($s)
+    function find_origional($namer)
     {
         $query = [
             'post_type' => 'attachment',
             'post_status'    => 'inherit',
-            's' => $s,
+            'name' => $namer['name'] . '.' . $namer['ext'],
             'orderby' => 'post_name',
-            'order' => 'ASC'
+            'order' => 'DESC'
         ];
         $result = new WP_Query($query);
 
-        if ($result->found_posts > 0) {
-            $origional = $result->post;
-            if (!$this->check_name($origional->post_name)) {
-                return $origional;
-            }
-        }
+        $origional = ($result->found_posts > 0) ? $result->post : false;
 
-        return false;
+        return $origional;
     }
 
     function run_cleaner()
     {
+        $reset_logs = get_option('fulcrum_ic_reset');
+
+
+        $logs = get_option('fulcrum_ic_logs');
+        if (!$logs || ($reset_logs && $reset_logs !== 'done')) $logs = [
+            'last_run' => time(),
+            'posts' => [],
+            'amount_deleted' => 0,
+            'origionals_found' => 0,
+            'posts_updated' => 0
+        ];
+
+        if ($reset_logs !== 'done')
+            update_option('fulcrum_ic_reset', 'done');
+
+        $logs['last_run'] = time();
+
+        $return = [];
         // First lets get all the products that have a thumbnail id as well as hasn't been altered by teh system yet //
         $query = [
-            'post_type' => 'product',
-            'posts_per_page' => 35,
-            'orderby' => 'post_title',
+            'post_type' => 'attachment',
+            'posts_per_page' => 50,
+            'orderby' => 'name',
+            'order' => 'ASC',
+            'post_status' => 'inherit',
             'meta_query' => [
                 'relation' => 'AND',
                 [
-                    'key' => '_thumbnail_id',
-                    'compare' => 'EXISTS'
-                ],
-                [
                     'key' => 'ic-altered',
                     'compare' => 'NOT EXISTS'
-                ],
-                [
-                    'key' => 'ic-origional',
-                    'compare' => 'NOT EXISTS'
                 ]
-            ],
+            ]
         ];
 
-        $products = new WP_Query($query);
-        $logs = get_option('fulcrum_ic_logs');
-        if (!$logs) $logs = [];
+        $attachments = new WP_Query($query);
+        // lets go through each attachment and make if its a duplicate find its origional then update the parent post //
+        if ($attachments && $attachments->found_posts > 0) {
+            foreach ($attachments->posts as $attachment) {
 
-        $logs['last_run'] = time();
-        if ($products->found_posts > 0) {
-            $return = [];
-            foreach ($products->posts as $product) {
-                // for each product we walk through we need to check its attachment and force it to use the origional photo and then remove the duplicate photo / attachment. This can be done by looking for a - in the name and a number following that //
-                if (!isset($logs[$product->ID]))
-                    $logs[$product->ID] = [];
+                $origional = $delete = false;
+                $thumb_ids = [];
+                // $product = get_post_ancestors($attachment->ID);
+                // Find out if this is a duplicate or origional //
+                $namer = $this->check_name($attachment->post_name);
 
-                $featured = get_post(get_post_thumbnail_id($product->ID));
-                $namer = $this->check_name($featured->post_name);
-                if ($namer) {
-                    // we have a duplicate imate lets find the origional
-                    $origional = $this->find_origional($namer['name']);
+                $thumb_ids[$attachment->ID] = $attachment->ID;
 
-                    // now we need to delete the old post thumbnail (duplicate) //
-                    $logs[$product->ID]['deleted'] = $return['deleted_attachment'] = $deleted = wp_delete_attachment($featured->ID, true);
-                    // now we should update / set the new post thumbnail to use this origional image //
-                    $logs[$product->ID]['set_new_thumb'] = $return['set_new_thumb'] = $setting_new = set_post_thumbnail($product->ID, $origional->ID);
+                if (!isset($namer['is_origional']) && $namer['name'] !== '' && $namer['number'] !== false) {
+                    // we have a duplicate lets pull its origional //
+                    $origional = $this->find_origional($namer);
 
-                    $altered = [];
-                    if ($deleted) {
-                        $altered['deleted_old'] = ['id' => $featured->ID, 'time' => time()];
+                    if ($origional && isset($origional->ID)) {
+
+                        $logs['origionals_found'] += 1;
                     }
-
-                    if ($setting_new) {
-                        $altered['setting_new'] = ['id' => $origional->ID, 'time' => time()];
-                    }
-
-                    update_post_meta($product->ID, 'ic-logs', $altered);
-                    update_post_meta($product->ID, 'ic-altered', true);
-                } else {
-                    // is origional
-                    update_post_meta($product->ID, 'ic-origional', true);
                 }
+
+                $logs['last_attachments'] = $thumb_ids;
+
+                // Lets get all of our thumbnail id parent posts //
+                $q = [
+                    'post_type' => 'product',
+                    'posts_per_page' => -1,
+                    'orderby' => 'post_title',
+                    'meta_query' => [
+                        'relation' => 'OR',
+                        [
+                            'key' => '_thumbnail_id',
+                            'value' => $thumb_ids,
+                            'compare' => 'IN'
+                        ]
+                    ]
+                ];
+
+                $parent = new WP_Query($q);
+
+                if ($parent && $parent->found_posts > 0) {
+                    // If we do not have a matching origional we need to treat it as an origional //
+                    if (!$origional && isset($namer['is_origional']) && $namer['is_origional']) {
+                        // if this attachment is an origional then we should just alter the meta as it will not be needing an update to the post thumbnail //
+                        update_post_meta($attachment->ID, 'ic-is-origional', true);
+                        update_post_meta($attachment->ID, 'ic-altered', true);
+                        $logs['origionals_found'] += 1;
+                        $return['is_origional'] = true;
+                    } else {
+                        // Cycle through each product that came up for the query and lets make sure it uses our origional image as its thumbnail //
+                        foreach ($parent->posts as $post) {
+                            $setting_new = false;
+                            if ($origional && isset($origional->ID)) {
+                                $return['set_new_thumb'] = $setting_new = set_post_thumbnail($post->ID, $origional->ID);
+
+                                // now that we set the thumbnail lets add our meta data to image and post //
+                                update_post_meta($post->ID, 'ic-altered', true);
+                                if ($setting_new) {
+                                    $logs['posts_updated'] += 1;
+                                    $logs['posts'][time()] = $post->ID;
+                                    $delete = true;
+                                }
+                            }
+                        }
+                    }
+                } else if ($parent->found_posts === 0 && !$origional && (isset($namer['is_origional']) && $namer['is_origional'])) {
+                    // we found no results for this request //
+                    update_post_meta($attachment->ID, 'ic-altered', true);
+                    update_post_meta($attachment->ID, 'ic-not-thumbnail', true);
+                    $return['no-origional-no-thumb'] = $attachment;
+                } else if ($parent->found_posts === 0 && $origional) {
+                    // we have an origional image for this attachment and there are no posts so lets just delete it //
+                    $delete = true;
+                    $return['not-origional-no-parent-posts'] = true;
+                }
+
+                if ($delete) {
+                    $return['deleted_attachment'] = $deleted = wp_delete_attachment($attachment->ID, true);
+                    if ($deleted)
+                        $logs['amount_deleted'] += 1;
+                }
+
+                $logs['processed'][$attachment->ID] = $return;
             }
+
+            // now lets get all the posts for both the origional and the attachment //
+            // we need to update the image meta to add the attachments parent ids //
         }
         update_option('fulcrum_ic_logs', $logs);
     }
