@@ -3,7 +3,7 @@
 /**
  *
  * @package Fulcrum
- * @version 0.9.7.4
+ * @version 0.9.8
  */
 
 namespace D\FULCRUM;
@@ -13,7 +13,7 @@ namespace D\FULCRUM;
  * Plugin Name: Fulcrum - Helper Tool
  * Plugin URI: https://duffion.com
  * Description: This is the custom built tool that allows for modular helper tools for Fulcrum Synced sites
- * Version: 0.9.7.4
+ * Version: 0.9.8
  * Author: Chris "Duffs" Crevling
  * Text Domain: fulcrum-pos
  * Author URI: https://duffion.com
@@ -34,7 +34,7 @@ if (!class_exists('D_FULCRUM')) :
     class D_FULCRUM
     {
 
-        var $version = '0.9.7.4';
+        var $version = '0.9.8';
 
         public $settings = [];
 
@@ -148,7 +148,41 @@ if (!class_exists('D_FULCRUM')) :
             $this->_load();
 
             // Do anything extra after we have loaded in the core //
+            $this->register_plugin_hooks();
+        }
 
+        function register_plugin_hooks()
+        {
+            // on activate //
+            register_activation_hook(__FILE__, 'activate_plugin');
+
+            // on deactivate //
+            register_deactivation_hook(__FILE__, 'deactivate_plugin');
+        }
+
+        function deactivate_plugin()
+        {
+            // we need to remove all cron jobs this plugin has registered //
+            global $d__crons;
+            $d__crons->unschedule_hooks();
+
+            // remove all plugin option data //
+            $options = [
+                'fulcrum_adp_categories',
+                'fulcrum_adp_published',
+                'fulcrum_ic_logs',
+                'fulcrum_ic_reset',
+                'fulcrum__pcs_jobs',
+                'fulcrum_cron_actions'
+            ];
+
+            foreach ($options as $option) {
+                delete_option($option);
+            }
+        }
+
+        function activate_plugin()
+        {
         }
     }
 
