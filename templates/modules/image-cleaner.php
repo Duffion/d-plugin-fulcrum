@@ -49,7 +49,7 @@ if ($count->found_posts > 0) {
                     ?>
                                 <div class="card col-4 adp-jobs-job">
                                     <div class="card-body">
-                                        <h5 class="card-title"><a href="<?= get_permalink($post); ?>"><?= $post->post_title; ?></a></h5>
+                                        <h5 class="card-title"><a href="<?= get_edit_post_link($id); ?>"><?= $post->post_title; ?></a></h5>
                                     </div>
                                 </div>
                     <?php
