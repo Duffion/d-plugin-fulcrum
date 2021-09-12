@@ -148,7 +148,7 @@ class fulcrum_ic
         // First lets get all the products that have a thumbnail id as well as hasn't been altered by teh system yet //
         $query = [
             'post_type' => 'attachment',
-            'posts_per_page' => 50,
+            'posts_per_page' => 75,
             'orderby' => 'name',
             'order' => 'ASC',
             'post_status' => 'inherit',
