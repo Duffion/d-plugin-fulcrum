@@ -159,7 +159,7 @@ class fulcrum_ic
         // First lets get all the products that have a thumbnail id as well as hasn't been altered by teh system yet //
         $query = [
             'post_type' => 'attachment',
-            'posts_per_page' => 75,
+            'posts_per_page' => 50,
             'orderby' => 'name',
             'order' => 'DESC',
             'post_status' => 'inherit',
@@ -167,10 +167,6 @@ class fulcrum_ic
                 'relation' => 'AND',
                 [
                     'key' => 'ic-processed',
-                    'compare' => 'NOT EXISTS'
-                ],
-                [
-                    'key' => 'ic-not-product',
                     'compare' => 'NOT EXISTS'
                 ]
             ]

@@ -25,10 +25,10 @@ if ($count->found_posts > 0) {
             <div class="col-12-sm gy-5">
                 <h1 class="display-2">Media / Image Cleaner</h1>
                 <?php if ($logs) { ?>
-                    <h4>Last Run: <?= date('m-d-Y H:i:s a', $logs['last_run']); ?></h4>
-                    <p>Total Posts Updated: <strong><?= $logs['posts_updated']; ?></strong></p>
-                    <p>Media Deleted: <strong><?= $logs['amount_deleted']; ?></strong></p>
-                    <p>Origional Media Found: <strong><?= $logs['origionals_found']; ?></strong></p>
+                    <h4>Last Run: <?= date('m-d-Y h:i:s a', $logs['last_run']); ?></h4>
+                    <p>Total Posts Updated: <strong><?= (isset($logs['posts_updated']) ? $logs['posts_updated'] : 0); ?></strong></p>
+                    <p>Media Deleted: <strong><?= (isset($logs['amount_deleted']) ? $logs['amount_deleted'] : 0); ?></strong></p>
+                    <p>Origional Media Found: <strong><?= (isset($logs['origionals_found']) ? $logs['origionals_found'] : 0); ?></strong></p>
                     <h5>Total Current Media: <?= $count; ?></h5>
                 <?php } else { ?>
                     <h4>Never ran sync</h4>
