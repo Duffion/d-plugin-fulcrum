@@ -90,8 +90,17 @@ class d_crons
         $check = $this->is_scheduled($action);
 
         if ($check) {
-            // it is scheduled lets see if we have to update the call //
+            $crons = _get_cron_array();
 
+            // it is scheduled lets see if we have to update the call //
+            if ($crons[$check] && $cron = $crons[$check][$action]) {
+                $cron = $cron[key($cron)];
+                if ($frequency !== $cron['schedule']) {
+                    // we need to update the cron //
+                    $this->unschedule_hooks($action);
+                    $this->schedule($action, $frequency);
+                }
+            }
         } else {
             // lets make sure we register the hook into our options for removal later //
             $actions = get_option('fulcrum_cron_actions');
@@ -104,12 +113,14 @@ class d_crons
         }
     }
 
-    function unschedule_hooks()
+    function unschedule_hooks($action = false)
     {
-        $actions = get_option('fulcrum_cron_actions');
+        $actions = (!$action ? get_option('fulcrum_cron_actions') : [$action]);
 
         if ($actions && count($actions) > 0) {
             foreach ($actions as $action) {
+                $timestamp = $this->is_scheduled($action);
+                wp_unschedule_event($timestamp, $action);
                 wp_unschedule_hook($action);
             }
         }

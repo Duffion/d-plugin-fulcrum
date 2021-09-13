@@ -84,22 +84,29 @@ class fulcrum_ic
         ];
 
         $x = explode('-', $name);
+        $coming_soon = strpos($name, 'image-coming-soon');
+
         if (count($x) >= 1) {
             // We need to cycle through the explosion in order to see if this is an origional //
             foreach ($x as $i => $part) {
                 if ($i === 0) {
-                    $output['name'] = $part;
+                    if ($coming_soon === false) {
+                        $output['name'] = $part;
+                    } else {
+                        $output['name'] = 'image-coming-soon-placeholder';
+                    }
                 } else {
                     if (in_array($part, ['jpg', 'gif', 'png', 'jpeg'])) {
                         $output['ext'] = $part;
                     } else {
                         if (is_numeric($part))
                             $output['number'] = $part;
-                        else
+                        else if (!is_numeric($part) && $coming_soon === false)
                             $output['is_origional'] = true;
                     }
                 }
             }
+
 
             if (count($x) === 2) {
                 $output['is_origional'] = true;
@@ -125,6 +132,10 @@ class fulcrum_ic
         return $origional;
     }
 
+    function run_no_image_cleaner()
+    {
+    }
+
     function run_cleaner()
     {
         $reset_logs = get_option('fulcrum_ic_reset');
@@ -148,20 +159,21 @@ class fulcrum_ic
         // First lets get all the products that have a thumbnail id as well as hasn't been altered by teh system yet //
         $query = [
             'post_type' => 'attachment',
-            'posts_per_page' => 75,
+            'posts_per_page' => 50,
             'orderby' => 'name',
-            'order' => 'ASC',
+            'order' => 'DESC',
             'post_status' => 'inherit',
             'meta_query' => [
                 'relation' => 'AND',
                 [
-                    'key' => 'ic-altered',
+                    'key' => 'ic-processed',
                     'compare' => 'NOT EXISTS'
                 ]
             ]
         ];
 
         $attachments = new WP_Query($query);
+
         // lets go through each attachment and make if its a duplicate find its origional then update the parent post //
         if ($attachments && $attachments->found_posts > 0) {
             foreach ($attachments->posts as $attachment) {
@@ -171,7 +183,6 @@ class fulcrum_ic
                 // $product = get_post_ancestors($attachment->ID);
                 // Find out if this is a duplicate or origional //
                 $namer = $this->check_name($attachment->post_name);
-
                 $thumb_ids[$attachment->ID] = $attachment->ID;
 
                 if (!isset($namer['is_origional']) && $namer['name'] !== '' && $namer['number'] !== false) {
@@ -208,7 +219,7 @@ class fulcrum_ic
                     if (!$origional && isset($namer['is_origional']) && $namer['is_origional']) {
                         // if this attachment is an origional then we should just alter the meta as it will not be needing an update to the post thumbnail //
                         update_post_meta($attachment->ID, 'ic-is-origional', true);
-                        update_post_meta($attachment->ID, 'ic-altered', true);
+                        update_post_meta($attachment->ID, 'ic-processed', true);
                         $logs['origionals_found'] += 1;
                         $return['is_origional'] = true;
                     } else {
@@ -219,7 +230,7 @@ class fulcrum_ic
                                 $return['set_new_thumb'] = $setting_new = set_post_thumbnail($post->ID, $origional->ID);
 
                                 // now that we set the thumbnail lets add our meta data to image and post //
-                                update_post_meta($post->ID, 'ic-altered', true);
+                                update_post_meta($post->ID, 'ic-processed', true);
                                 if ($setting_new) {
                                     $logs['posts_updated'] += 1;
                                     $logs['posts'][time()] = $post->ID;
@@ -230,12 +241,12 @@ class fulcrum_ic
                     }
                 } else if ($parent->found_posts === 0 && !$origional && (isset($namer['is_origional']) && $namer['is_origional'])) {
                     // we found no results for this request //
-                    update_post_meta($attachment->ID, 'ic-altered', true);
+                    update_post_meta($attachment->ID, 'ic-processed', true);
                     update_post_meta($attachment->ID, 'ic-not-thumbnail', true);
                     $return['no-origional-no-thumb'] = $attachment;
                 } else if ($parent->found_posts === 0 && $origional) {
                     // we have an origional image for this attachment and there are no posts so lets just delete it //
-                    $delete = true;
+                    // $delete = true;
                     $return['not-origional-no-parent-posts'] = true;
                 }
 
