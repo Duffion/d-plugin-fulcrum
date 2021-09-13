@@ -40,7 +40,7 @@ if ($count->found_posts > 0) {
                 <h2>History of updated posts</h2>
                 <div class="results adp-jobs gy-5 d-inline-flex flex-wrap">
                     <?php
-                    if (count($logs['posts']) > 0) {
+                    if ($logs && isset($logs['posts']) && count($logs['posts']) > 0) {
                         $posts = array_reverse($logs['posts']);
                         $i = 0;
                         foreach ($posts as $id) {

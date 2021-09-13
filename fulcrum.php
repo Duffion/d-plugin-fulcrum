@@ -13,7 +13,7 @@ namespace D\FULCRUM;
  * Plugin Name: Fulcrum - Helper Tool
  * Plugin URI: https://duffion.com
  * Description: This is the custom built tool that allows for modular helper tools for Fulcrum Synced sites
- * Version: 0.9.8.3
+ * Version: 0.9.8.4
  * Author: Chris "Duffs" Crevling
  * Text Domain: fulcrum-pos
  * Author URI: https://duffion.com
@@ -34,7 +34,7 @@ if (!class_exists('D_FULCRUM')) :
     class D_FULCRUM
     {
 
-        var $version = '0.9.8.3';
+        var $version = '0.9.8.4';
 
         public $settings = [];
 

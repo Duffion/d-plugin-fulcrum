@@ -46,7 +46,12 @@ class fulcrum_ic
             'position' => 2
         ];
 
-        $this->actions = [];
+        $this->actions = [
+            // 'run_cleaner' => [
+            //     'hook' => 'wp_loaded',
+            //     'function' => 'run_cleaner'
+            // ]
+        ];
 
         $this->filters = [
             'add_subpage' => [
@@ -107,6 +112,9 @@ class fulcrum_ic
                 }
             }
 
+            if ($coming_soon !== false && $output['number'] === false) {
+                $output['is_origional'] = true;
+            }
 
             if (count($x) === 2) {
                 $output['is_origional'] = true;
@@ -161,12 +169,13 @@ class fulcrum_ic
             'post_type' => 'attachment',
             'posts_per_page' => 50,
             'orderby' => 'name',
+            // 's' => 'image-coming-soon-placeholder',
             'order' => 'DESC',
             'post_status' => 'inherit',
             'meta_query' => [
                 'relation' => 'AND',
                 [
-                    'key' => 'ic-processed',
+                    'key' => 'ic-processed-media',
                     'compare' => 'NOT EXISTS'
                 ]
             ]
@@ -177,91 +186,114 @@ class fulcrum_ic
         // lets go through each attachment and make if its a duplicate find its origional then update the parent post //
         if ($attachments && $attachments->found_posts > 0) {
             foreach ($attachments->posts as $attachment) {
+                if (is_object($attachment) && isset($attachment->ID)) {
+                    $origional = $delete = false;
+                    $thumb_ids = [];
+                    // $product = get_post_ancestors($attachment->ID);
+                    // Find out if this is a duplicate or origional //
+                    $namer = $this->check_name($attachment->post_name);
+                    $thumb_ids[$attachment->ID] = $attachment->ID;
 
-                $origional = $delete = false;
-                $thumb_ids = [];
-                // $product = get_post_ancestors($attachment->ID);
-                // Find out if this is a duplicate or origional //
-                $namer = $this->check_name($attachment->post_name);
-                $thumb_ids[$attachment->ID] = $attachment->ID;
+                    if (!isset($namer['is_origional']) && $namer['name'] !== '' && $namer['number'] !== false) {
+                        // we have a duplicate lets pull its origional //
+                        $origional = $this->find_origional($namer);
 
-                if (!isset($namer['is_origional']) && $namer['name'] !== '' && $namer['number'] !== false) {
-                    // we have a duplicate lets pull its origional //
-                    $origional = $this->find_origional($namer);
+                        if ($origional && isset($origional->ID)) {
 
-                    if ($origional && isset($origional->ID)) {
-
-                        $logs['origionals_found'] += 1;
+                            $logs['origionals_found'] += 1;
+                        }
                     }
-                }
 
-                $logs['last_attachments'] = $thumb_ids;
+                    $logs['last_attachments'] = $thumb_ids;
 
-                // Lets get all of our thumbnail id parent posts //
-                $q = [
-                    'post_type' => 'product',
-                    'posts_per_page' => -1,
-                    'orderby' => 'post_title',
-                    'meta_query' => [
-                        'relation' => 'OR',
-                        [
-                            'key' => '_thumbnail_id',
-                            'value' => $thumb_ids,
-                            'compare' => 'IN'
+                    // Lets get all of our thumbnail id parent posts //
+                    $q = [
+                        'post_type' => 'product',
+                        'posts_per_page' => -1,
+                        'orderby' => 'post_title',
+                        'meta_query' => [
+                            'relation' => 'OR',
+                            [
+                                'key' => '_thumbnail_id',
+                                'value' => $thumb_ids,
+                                'compare' => 'IN'
+                            ]
                         ]
-                    ]
-                ];
+                    ];
 
-                $parent = new WP_Query($q);
+                    $parent = new WP_Query($q);
 
-                if ($parent && $parent->found_posts > 0) {
-                    // If we do not have a matching origional we need to treat it as an origional //
-                    if (!$origional && isset($namer['is_origional']) && $namer['is_origional']) {
-                        // if this attachment is an origional then we should just alter the meta as it will not be needing an update to the post thumbnail //
-                        update_post_meta($attachment->ID, 'ic-is-origional', true);
-                        update_post_meta($attachment->ID, 'ic-processed', true);
-                        $logs['origionals_found'] += 1;
-                        $return['is_origional'] = true;
-                    } else {
-                        // Cycle through each product that came up for the query and lets make sure it uses our origional image as its thumbnail //
-                        foreach ($parent->posts as $post) {
-                            $setting_new = false;
-                            if ($origional && isset($origional->ID)) {
-                                $return['set_new_thumb'] = $setting_new = set_post_thumbnail($post->ID, $origional->ID);
+                    if ($parent && $parent->found_posts > 0) {
+                        // If we do not have a matching origional we need to treat it as an origional //
+                        if (!$origional && isset($namer['is_origional']) && $namer['is_origional']) {
+                            // if this attachment is an origional then we should just alter the meta as it will not be needing an update to the post thumbnail //
+                            update_post_meta($attachment->ID, 'ic-is-origional', true);
+                            update_post_meta($attachment->ID, 'ic-processed-media', true);
+                            $logs['origionals_found'] += 1;
+                            $return['is_origional'] = true;
+                        } else {
+                            // Cycle through each product that came up for the query and lets make sure it uses our origional image as its thumbnail //
+                            foreach ($parent->posts as $post) {
+                                $setting_new = false;
+                                if ($origional && isset($origional->ID)) {
+                                    $return['set_new_thumb'] = $setting_new = set_post_thumbnail($post->ID, $origional->ID);
 
-                                // now that we set the thumbnail lets add our meta data to image and post //
-                                update_post_meta($post->ID, 'ic-processed', true);
-                                if ($setting_new) {
-                                    $logs['posts_updated'] += 1;
-                                    $logs['posts'][time()] = $post->ID;
-                                    $delete = true;
+                                    // now that we set the thumbnail lets add our meta data to image and post //
+                                    update_post_meta($post->ID, 'ic-processed-media', true);
+                                    if ($setting_new) {
+                                        $logs['posts_updated'] += 1;
+                                        $logs['posts'][time()] = $post->ID;
+                                        $delete = true;
+                                    }
                                 }
                             }
                         }
+                    } else if ($parent->found_posts === 0 && !$origional && (isset($namer['is_origional']) && $namer['is_origional'])) {
+                        // we found no results for this request //
+                        update_post_meta($attachment->ID, 'ic-processed-media', true);
+                        update_post_meta($attachment->ID, 'ic-not-thumbnail', true);
+                        $return['no-origional-no-thumb'] = $attachment;
+                    } else if ($parent->found_posts === 0 && $origional) {
+                        // we have an origional image for this attachment and there are no posts so lets just delete it //
+                        // $delete = true;
+                        // lets make sure our origional image has products //
+                        $args = [
+                            'post_type' => 'product',
+                            'posts_per_page' => 1,
+                            'meta_query' => [
+                                [
+                                    'key' => '_thumbnail_id',
+                                    'value' => $origional->ID
+                                ]
+                            ]
+                        ];
+
+                        $org_prods = new WP_Query($args);
+                        if ($org_prods && $org_prods->found_posts > 0) {
+                            // we have products for our origional we can safely delete this clone //
+                            $delete = true;
+                        } else {
+                            update_post_meta($attachment->ID, 'ic-processed-media', true);
+                            update_post_meta($attachment->ID, 'ic-no-product-association', true);
+                        }
+
+                        $return['not-origional-no-parent-posts'] = true;
                     }
-                } else if ($parent->found_posts === 0 && !$origional && (isset($namer['is_origional']) && $namer['is_origional'])) {
-                    // we found no results for this request //
-                    update_post_meta($attachment->ID, 'ic-processed', true);
-                    update_post_meta($attachment->ID, 'ic-not-thumbnail', true);
-                    $return['no-origional-no-thumb'] = $attachment;
-                } else if ($parent->found_posts === 0 && $origional) {
-                    // we have an origional image for this attachment and there are no posts so lets just delete it //
-                    // $delete = true;
-                    $return['not-origional-no-parent-posts'] = true;
-                }
 
-                if ($delete) {
-                    $return['deleted_attachment'] = $deleted = wp_delete_attachment($attachment->ID, true);
-                    if ($deleted)
-                        $logs['amount_deleted'] += 1;
-                }
+                    if ($delete) {
+                        $return['deleted_attachment'] = $deleted = wp_delete_attachment($attachment->ID, true);
+                        if ($deleted)
+                            $logs['amount_deleted'] += 1;
+                    }
 
-                $logs['processed'][$attachment->ID] = $return;
+                    $logs['processed-media'][$attachment->ID] = $return;
+                }
             }
 
             // now lets get all the posts for both the origional and the attachment //
             // we need to update the image meta to add the attachments parent ids //
         }
+
         update_option('fulcrum_ic_logs', $logs);
     }
 }
