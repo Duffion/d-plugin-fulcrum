@@ -19,7 +19,7 @@ class fulcrum_ic
     use D_PRIME, D_TEMPLATES;
 
     var $menu_item = [],
-        $per_page_index = 75,
+        $per_page_index = 50,
         $per_page = 25;
 
     function __construct()
@@ -78,10 +78,10 @@ class fulcrum_ic
         }
 
         add_action('ic__run_index', [$this, 'index_attachments']);
-        $this->cron->schedule('ic__run_index', 'one_minute');
+        $this->cron->schedule('ic__run_index', 'five_minutes');
 
         add_action('ic__run_cleaner', [$this, 'run_cleaner']);
-        $this->cron->schedule('ic__run_cleaner', 'five_minutes');
+        $this->cron->schedule('ic__run_cleaner', 'ten_minutes');
     }
 
     function view_ic()

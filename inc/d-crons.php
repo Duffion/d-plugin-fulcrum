@@ -21,6 +21,11 @@ class d_crons
             'display' => 'Every Five Minutes'
         ],
         [
+            'name' => 'ten_minutes',
+            'interval' => 600,
+            'display' => 'Every Ten Minutes'
+        ],
+        [
             'name' => 'one_minute',
             'interval' => 60,
             'display' => 'Every Minute'
