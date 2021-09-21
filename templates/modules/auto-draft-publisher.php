@@ -98,7 +98,7 @@ if ($published)
                                 <div class="card col-4 adp-jobs-job">
                                     <div class="card-body">
                                         <h5 class="card-title">
-                                            <a href="<?= get_permalink($post); ?>">
+                                            <a href="<?= get_edit_post_link($post['id']); ?>">
                                                 <strong>
                                                     <?= $post['post_title']; ?>
                                                 </strong>
