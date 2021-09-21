@@ -19,8 +19,8 @@ class fulcrum_ic
     use D_PRIME, D_TEMPLATES;
 
     var $menu_item = [],
-        $per_page_index = 200,
-        $per_page = 50;
+        $per_page_index = 75,
+        $per_page = 25;
 
     function __construct()
     {
@@ -81,7 +81,7 @@ class fulcrum_ic
         $this->cron->schedule('ic__run_index', 'one_minute');
 
         add_action('ic__run_cleaner', [$this, 'run_cleaner']);
-        $this->cron->schedule('ic__run_cleaner', 'one_minute');
+        $this->cron->schedule('ic__run_cleaner', 'five_minutes');
     }
 
     function view_ic()

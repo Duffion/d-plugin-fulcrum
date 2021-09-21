@@ -34,7 +34,7 @@ if (!class_exists('D_FULCRUM')) :
     class D_FULCRUM
     {
 
-        var $version = '0.9.8.5';
+        var $version = '0.9.8.6';
 
         public $settings = [];
 
