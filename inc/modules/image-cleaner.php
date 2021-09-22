@@ -121,7 +121,7 @@ class fulcrum_ic
 
     function generate_cooldown()
     {
-        $time = strtotime("+ 1 day");
+        $time = strtotime("+ 1 week");
 
         return $time;
     }
@@ -323,8 +323,8 @@ class fulcrum_ic
                     'relation' => 'OR',
                     [
                         'key' => 'ic_altered',
-                        'value' => $cooldown,
-                        'compare' => '<',
+                        'value' => time(),
+                        'compare' => '<=',
                     ],
                     [
                         'key' => 'ic_altered',
@@ -353,7 +353,7 @@ class fulcrum_ic
 
                 $index['attachments'][$post->ID] = $this->process_attachment($attachment, $post);
                 // now set this as indexed //
-                $updated = update_post_meta($post->ID, 'ic_index', time());
+                $updated = update_post_meta($post->ID, 'ic_index', $cooldown);
             }
 
             // wpp($index) . die;
