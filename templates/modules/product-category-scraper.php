@@ -25,8 +25,6 @@ $nonce = (isset($args['nonce']) ? $args['nonce'] : false);
                         <div class="btn-group">
                             <button class="btn btn-success" type="button" data-modal-trigger="#pcs-add-modal">+ Add New Job</button>
                             <button class="btn btn-secondary" type="button" data-fulcrum-action="run-jobs">Manually Run Jobs</button>
-                            <button class="btn btn-light" type="button" data-fulcrum-action="export-jobs">Export Jobs</button>
-                            <button class="btn btn-light" type="button" data-fulcrum-action="import-jobs">Import Jobs</button>
                         </div>
                     </div>
                 </div>
