@@ -77,6 +77,7 @@ class d_core
     {
         echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
         echo '<h2>Fulcrum Helper Dashboard</h2>';
+        echo '<div class="notification"><b>Coming Soon!</b></div>';
         echo '</div>';
     }
 
@@ -85,6 +86,7 @@ class d_core
         // We need to load in the dashboard template //
         echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
         echo '<h2>Fulcrum Plugin Settings</h2>';
+        echo '<div class="notification"><b>Coming Soon!</b></div>';
         echo '</div>';
     }
 }

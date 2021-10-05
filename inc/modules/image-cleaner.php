@@ -78,10 +78,10 @@ class fulcrum_ic
         }
 
         add_action('ic__run_index', [$this, 'index_attachments']);
-        $this->cron->schedule('ic__run_index', 'five_minutes');
+        $this->cron->schedule('ic__run_index', 'three_minutes');
 
         add_action('ic__run_cleaner', [$this, 'run_cleaner']);
-        $this->cron->schedule('ic__run_cleaner', 'ten_minutes');
+        $this->cron->schedule('ic__run_cleaner', 'five_minutes');
     }
 
     function view_ic()
@@ -128,17 +128,17 @@ class fulcrum_ic
 
     function process_attachment($attachment, $post)
     {
-        $output = [
-            'origional' => false,
-            'name' => $attachment->post_name,
-            'ext' => false,
-            'id' => $attachment->ID,
-            'is_clone' => false,
-            'is_coming_soon' => false
-        ];
 
         if ($attachment && isset($attachment->ID)) {
-            $hash = get_post_meta($attachment->ID, 'mdd_hash', true);
+            $output = [
+                'origional' => false,
+                'name' => $attachment->post_name,
+                'ext' => false,
+                'id' => $attachment->ID,
+                'is_clone' => false,
+                'is_coming_soon' => false
+            ];
+
             // first we need to check the name to see if this is a duplicate //
             $name = $attachment->post_name;
             $namer = explode('-', $name);
@@ -149,8 +149,11 @@ class fulcrum_ic
                 // check if we have an ext part //
                 if (in_array($part, ['jpg', 'gif', 'png', 'jpeg'])) {
                     $output['ext'] = $part;
+                    unset($namer[$i]);
                 }
             }
+
+            $namer = array_values($namer);
 
             if ($coming_soon !== FALSE) {
                 $output['is_coming_soon'] = true;
@@ -297,7 +300,8 @@ class fulcrum_ic
     {
         $index = get_transient('fulcrum_ic_indexed');
         if (!$index) $index = [
-            'attachments' => []
+            'attachments' => [],
+            'total_posts' => 0
         ];
 
         $index['last_run'] = time();
@@ -323,7 +327,7 @@ class fulcrum_ic
                     'relation' => 'OR',
                     [
                         'key' => 'ic_altered',
-                        'value' => time(),
+                        'value' => strtotime('-1 week'),
                         'compare' => '<=',
                     ],
                     [
@@ -350,37 +354,63 @@ class fulcrum_ic
 
             foreach ($products->posts as $i => $post) {
                 $attachment = get_post(get_post_thumbnail_id($post->ID));
-
-                $index['attachments'][$post->ID] = $this->process_attachment($attachment, $post);
+                $data = $this->process_attachment($attachment, $post);
+                if ($data) {
+                    $index['attachments'][$post->ID] = $data;
+                }
                 // now set this as indexed //
                 $updated = update_post_meta($post->ID, 'ic_index', $cooldown);
             }
 
             // wpp($index) . die;
             // now lets update our transient //
-            set_transient('fulcrum_ic_indexed', $index, 0);
             // wpp(count($index['attachments'])) . die;
+        }
+        set_transient('fulcrum_ic_indexed', $index, 0);
+    }
+
+    function reset_index_meta($paged = 1)
+    {
+        $q = [
+            'post_type' => 'product',
+            'posts_per_page' => 100,
+            'paged' => $paged,
+            'post_status' => ['publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash'],
+            'orderby' => 'post_title',
+            'order' => 'ASC',
+            'fields' => 'ids',
+            'meta_query' => [
+                'relation' => 'OR',
+                [
+                    'key' => 'ic_index',
+                    'compare' => 'EXISTS'
+                ],
+
+                [
+                    'key' => 'ic_altered',
+                    'compare' => 'EXISTS'
+                ]
+            ]
+        ];
+
+        $indexed = new WP_Query($q);
+        if ($indexed->have_posts()) {
+            // we need to cycle through and delete all all these posts meta data //
+            $del = [];
+            foreach ($indexed->posts as $id) {
+                $del[$id] = [];
+                $del[$id]['ic_index'] = delete_post_meta($id, 'ic_index');
+                $del[$id]['ic_altered'] = delete_post_meta($id, 'ic_altered');
+            }
         }
     }
 
     function reset_indexes()
     {
-        $finished = get_transient('fulcrum_ic_finished');
-        if (isset($finished['attachments']) && count($finished['attachments']) > 0) {
-            foreach ($finished['attachments'] as $id => $attach) {
-                // lets reset our index meta trigger
-                update_post_meta($id, 'ic_altered', 0);
-            }
-        }
+        $paged = 1;
+        // we need to be able to run this as a background job using AJAX as it will need to process each page of results from the reset_index_meta() //
+        $this->reset_index_meta($paged);
 
-
-        $indexes = get_transient('fulcrum_ic_indexed');
-        if (isset($indexes['attachments']) && count($indexes['attachments']) > 0) {
-            foreach ($indexes['attachments'] as $id => $attach) {
-                // lets reset our index meta trigger
-                delete_post_meta($id, 'ic_index');
-            }
-        }
         delete_transient('fulcrum_ic_indexed');
         delete_transient('fulcrum_ic_finished');
         delete_option('fulcrum_ic_logs');
